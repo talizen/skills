@@ -16,7 +16,7 @@ Talizen uses its own runtime for rendering; it is not a standard browser fronten
 
 - This is a **file-based website system**. All pages are React components written in `.tsx` files.
 - The project is **not** a React single-page app. Do **not** use `react-router-dom` or similar client-side routing libraries.
-- Routing is derived from the `/page` directory (Astro-style):
+- Routing is derived from the `/page` directory（NextJs-style）:
   - `/page/Index.tsx` → `/`
   - `/page/About.tsx` → `/about`
 - The `/page` directory is required.
