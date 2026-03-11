@@ -1,3 +1,4 @@
+---
 name: talizen
 description: Guidance for building and configuring apps on the Talizen platform. Use this skill when working with Talizen projects, especially when editing `talizen.config.ts`, configuring file-based routes and CMS, enforcing Tailwind v4 styling rules, setting up SEO and `metadata`, or following platform-specific tool and reply conventions.
 ---
