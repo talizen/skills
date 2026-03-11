@@ -1,12 +1,12 @@
 name: talizen
-description: Guidance for building and configuring apps on the Talizen platform (formerly Folia). Use this skill when working with Talizen projects, especially when editing `talizen.config.ts`, configuring file-based routes and CMS, enforcing Tailwind v4 styling rules, setting up SEO and `metadata`, or following platform-specific tool and reply conventions.
+description: Guidance for building and configuring apps on the Talizen platform. Use this skill when working with Talizen projects, especially when editing `talizen.config.ts`, configuring file-based routes and CMS, enforcing Tailwind v4 styling rules, setting up SEO and `metadata`, or following platform-specific tool and reply conventions.
 ---
 
 # Talizen
 
 ## Overview
 
-This skill explains how to work inside the Talizen/Folia site builder from code: how to configure `talizen.config.ts`, respect the custom runtime and file-based routing rules, use the `talizen/cms` APIs, wire third-party imports via `importMap`, and correctly set up SEO using the `metadata` pattern. It also documents Talizen-specific tool usage (`diff_patch_file`, `lint`, `create_version`) and reply rules for the built-in AI assistant.
+This skill explains how to work inside the Talizen site builder from code: how to configure `talizen.config.ts`, respect the custom runtime and file-based routing rules, use the `talizen/cms` APIs, wire third-party imports via `importMap`, and correctly set up SEO using the `metadata` pattern. It also documents Talizen-specific tool usage (`diff_patch_file`, `lint`, `create_version`) and reply rules for the built-in AI assistant.
 
 Talizen apps are built with React components and a root configuration file `talizen.config.ts`. SEO is configured in two layers: global site-level metadata in `talizen.config.ts` and page-level metadata exported from each page component file.
 

@@ -4,7 +4,7 @@ title: Talizen SEO & Metadata
 
 # Talizen SEO & Metadata
 
-This document describes how to configure SEO on the Talizen platform (formerly Folia) using the `metadata` model. It applies both to site-level configuration in `talizen.config.ts` and page-level configuration in React page components.
+This document describes how to configure SEO on the Talizen platform using the `metadata` model. It applies both to site-level configuration in `talizen.config.ts` and page-level configuration in React page components.
 
 Talizen's SEO model is heavily inspired by Next.js `Metadata`. Prefer structured `metadata` over ad‑hoc `seo` blocks or raw `<meta>` tags.
 
@@ -309,4 +309,3 @@ Recommended steps:
    - `metadata.keywords`
    - `metadata.openGraph`
 4. Only use `customCode.head` for SEO when something cannot be expressed through `metadata`.
-
