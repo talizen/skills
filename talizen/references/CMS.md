@@ -12,6 +12,75 @@ Talizen provides at least two primary helpers:
 
 All fields returned from CMS may be missing or null, so code must use optional chaining and defensive access.
 
+## types/cms.d.ts file
+You can find all cms type definition in `/types/cms.d.ts` file.
+
+Rules:
+1. Read this file before writing CMS-related code. Fields like `__cmsKey`,
+   `slug`, `id`, and the exact `body` shape are useful when implementing logic.
+2. When writing code, import the needed types from this file, for example:
+   `import type { Blogs, Authors } from "./types/cms"`
+
+example:
+```
+export declare const CmsList: readonly [
+  {
+    key: "blogs"
+    name: "Talizen's blogs"
+    Item: Blogs
+  },
+  {
+    key: "authors"
+    name: "Talizen's authors"
+    Item: Authors
+  },
+]
+
+export interface Blogs {
+  readonly __cmsKey: "blogs"
+  slug: string
+  id: string
+  body: {
+    title?: string
+    content?: string
+    author?: Authors
+  }
+}
+
+export interface Authors {
+  readonly __cmsKey: "authors"
+  slug: string
+  id: string
+  body: {
+    name?: string
+    avatar?: string
+  }
+}
+```
+
+## talizen/cms package definition
+```
+export interface ListContentParams {
+    limit?: number
+    offset?: number
+    searchKey?: string
+}
+
+interface BaseCmsItem {
+    readonly __cmsKey: string
+}
+
+export declare function ListContent<T extends BaseCmsItem>(
+    key: T['__cmsKey'],
+    params: ListContentParams,
+): Promise<T[]>
+
+export declare function GetContent<T extends BaseCmsItem>(
+    key: T['__cmsKey'],
+    slug: string
+): Promise<T>
+```
+
 ## Listing Content
 
 Use `ListContent` to fetch lists such as blog posts, articles, or products.
