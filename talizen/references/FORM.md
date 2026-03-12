@@ -4,7 +4,11 @@ title: Talizen Form Usage
 
 # Talizen Form Usage
 
-This document describes how to submit data with `talizen/form` and how to use `/types/form.d.ts` as the source of truth for payload fields.
+This document describes the current Form API exported by `talizen/form`.
+It is based on the latest npm package definitions from `talizen@0.0.7`.
+
+Use `/types/form.d.ts` as the project schema source of truth, and use
+`talizen/form` for the submission helper.
 
 ## types/form.d.ts file
 
@@ -14,9 +18,10 @@ Rules:
 1. Read this file before writing form-related code.
 2. Import the needed payload types from this file, for example:
    `import type { ContactForm, Newsletter } from "./types/form"`
-3. Use the generated `__formKey` literal to keep the runtime key and payload type aligned.
+3. Keep the runtime key and payload shape aligned with the generated type.
 
 Example:
+
 ```ts
 export declare const FormList: readonly [
   {
@@ -36,34 +41,73 @@ export interface ContactForm {
 
 ## talizen/form package definition
 
+`talizen@0.0.7` currently exports:
+
 ```ts
-interface BaseFormPayload {
-  readonly __formKey: string
+import { type TalizenRequestOptions } from "talizen/core"
+
+export interface FormRecord {
+  readonly __formKey?: string
+  [key: string]: unknown
 }
 
-export declare function submit<T extends BaseFormPayload>(
-  key: T['__formKey'],
-  data: Omit<T, '__formKey'>,
-): Promise<void>
+export declare function submitForm<T extends FormRecord>(
+  keyOrToken: T["__formKey"] | string,
+  payload: T,
+  options?: TalizenRequestOptions,
+): Promise<"ok">
+```
+
+Important:
+- The current API name is `submitForm`.
+- Older docs that mention `submit` or `SubmitForm` are outdated unless the
+  project defines its own wrapper.
+- The first argument accepts either a form key or a token string.
+- The payload is sent directly; the helper does not strip `__formKey` for you.
+
+## Optional request config
+
+If needed, configure Talizen globally:
+
+```ts
+import { setTalizenConfig } from "talizen/core"
+
+setTalizenConfig({
+  baseUrl: "https://www.talizen.com",
+})
+```
+
+Or pass request options per call:
+
+```ts
+await submitForm<ContactForm>(
+  "contact-form",
+  {
+    __formKey: "contact-form",
+    email: "hi@example.com",
+  },
+  { baseUrl: "https://www.talizen.com" },
+)
 ```
 
 ## Submit a form
 
 ```tsx
-import { submit } from 'talizen/form'
-import type { ContactForm } from './types/form'
+import { submitForm } from "talizen/form"
+import type { ContactForm } from "./types/form"
 
 export default function ContactSection() {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    const payload: Omit<ContactForm, '__formKey'> = {
-      name: 'Taylor',
-      email: 'taylor@example.com',
-      message: 'Hello from Talizen!',
+    const payload: ContactForm = {
+      __formKey: "contact-form",
+      name: "Taylor",
+      email: "taylor@example.com",
+      message: "Hello from Talizen!",
     }
 
-    await submit<ContactForm>('contact-form', payload)
+    await submitForm<ContactForm>("contact-form", payload)
   }
 
   return (
@@ -74,8 +118,21 @@ export default function ContactSection() {
 }
 ```
 
-Guidelines:
-- Keep `submit` in client-side event handlers such as `onSubmit` or `onClick`.
-- Send plain serializable values only.
-- Reuse the generated type so field names stay correct.
-- Show a success or error state in the UI after submission.
+Alternative when you only have a token:
+
+```ts
+await submitForm("form-token", {
+  email: "taylor@example.com",
+  message: "Hello from Talizen!",
+})
+```
+
+## Form guidelines
+
+- Keep `submitForm` in client-side event handlers such as `onSubmit` or
+  `onClick`.
+- Prefer the generated type from `/types/form.d.ts`.
+- Include `__formKey` in the typed payload when your project schema provides it.
+- Use a token when the integration gives you a token instead of a stable form
+  key.
+- Show explicit success and error UI states after submission.

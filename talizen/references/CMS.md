@@ -4,25 +4,26 @@ title: Talizen CMS Usage
 
 # Talizen CMS Usage
 
-This document describes how to use the Talizen CMS APIs from code. It focuses on fetching content via `talizen/cms` inside `getServerSideProps` and safely rendering it in page components.
+This document describes the current CMS API exported by `talizen/cms`.
+It is based on the latest npm package definitions from `talizen@0.0.7`.
 
-Talizen provides at least two primary helpers:
-- `ListContent` — fetch a paginated list of content items
-- `GetContent` — fetch a single content item by identifier
-
-All fields returned from CMS may be missing or null, so code must use optional chaining and defensive access.
+Use your project's `/types/cms.d.ts` as the schema source of truth, and use
+`talizen/cms` for the platform-level fetch helpers.
 
 ## types/cms.d.ts file
-You can find all cms type definition in `/types/cms.d.ts` file.
+
+You can find all CMS schema definitions in `/types/cms.d.ts`.
 
 Rules:
-1. Read this file before writing CMS-related code. Fields like `__cmsKey`,
-   `slug`, `id`, and the exact `body` shape are useful when implementing logic.
-2. When writing code, import the needed types from this file, for example:
+1. Read this file before writing CMS-related code.
+2. Import the needed project types from this file, for example:
    `import type { Blogs, Authors } from "./types/cms"`
+3. Treat CMS fields as optional unless your generated schema guarantees
+   otherwise.
 
-example:
-```
+Example:
+
+```ts
 export declare const CmsList: readonly [
   {
     key: "blogs"
@@ -46,117 +47,208 @@ export interface Blogs {
     author?: Authors
   }
 }
-
-export interface Authors {
-  readonly __cmsKey: "authors"
-  slug: string
-  id: string
-  body: {
-    name?: string
-    avatar?: string
-  }
-}
 ```
 
 ## talizen/cms package definition
-```
-export interface ListContentParams {
-    limit?: number
-    offset?: number
-    searchKey?: string
-}
 
-interface BaseCmsItem {
-    readonly __cmsKey: string
-}
-
-export declare function ListContent<T extends BaseCmsItem>(
-    key: T['__cmsKey'],
-    params: ListContentParams,
-): Promise<T[]>
-
-export declare function GetContent<T extends BaseCmsItem>(
-    key: T['__cmsKey'],
-    slug: string
-): Promise<T>
-```
-
-## Listing Content
-
-Use `ListContent` to fetch lists such as blog posts, articles, or products.
+`talizen@0.0.7` currently exports the following CMS types:
 
 ```ts
-import { ListContent } from 'talizen/cms'
+import { type TalizenRequestOptions } from "talizen/core"
 
-export async function getServerSideProps(context) {
-  const res = await ListContent('blogs', { page: 1, offset: 0 }) // { total, list }
+export interface BaseCmsItem {
+  readonly __cmsKey: string
+  slug: string
+  id: string
+  body: Record<string, unknown>
+}
+
+export interface GetContentListFilterCondition {
+  fieldId?: string
+  operator?: string
+  value?: any
+}
+
+export interface GetContentListFilter {
+  match?: "any" | "all"
+  conditions?: GetContentListFilterCondition[]
+}
+
+export interface ListContentParams {
+  limit?: number
+  offset?: number
+  searchKey?: string
+  orderBy?: string
+  builtinRef?: boolean
+  filter?: GetContentListFilter
+}
+
+export interface GetContentParams {
+  builtinRef?: boolean
+}
+
+export interface GetContentWithPrevNextParams extends GetContentParams {
+  prev?: boolean
+  next?: boolean
+  searchKey?: string
+  orderBy?: string
+  filter?: GetContentListFilter
+}
+
+export interface ListResponse<T> {
+  list?: T[]
+  total?: number
+}
+
+export interface ContentWithPrevNext<T extends BaseCmsItem> {
+  current?: T
+  next?: T
+  prev?: T
+}
+
+export declare function listContents<T extends BaseCmsItem>(
+  key: T["__cmsKey"],
+  params?: ListContentParams,
+  options?: TalizenRequestOptions,
+): Promise<ListResponse<T>>
+
+export declare function getContent<T extends BaseCmsItem>(
+  key: T["__cmsKey"],
+  slug: string,
+  params?: GetContentParams,
+  options?: TalizenRequestOptions,
+): Promise<T>
+
+export declare function getContentWithPrevNext<T extends BaseCmsItem>(
+  key: T["__cmsKey"],
+  slug: string,
+  params?: GetContentWithPrevNextParams,
+  options?: TalizenRequestOptions,
+): Promise<ContentWithPrevNext<T>>
+```
+
+Important:
+- The current package uses `listContents`, `getContent`, and
+  `getContentWithPrevNext`.
+- Older names like `ListContent` and `GetContent` should be treated as outdated
+  documentation unless the project provides its own wrapper.
+- All three APIs support an optional third or fourth `options` argument from
+  `talizen/core`.
+
+## List content
+
+Use `listContents` for paginated content lists.
+
+```ts
+import { listContents } from "talizen/cms"
+import type { Blogs } from "./types/cms"
+
+export async function getServerSideProps() {
+  const content = await listContents<Blogs>("blogs", {
+    limit: 10,
+    offset: 0,
+    orderBy: "createdAt desc",
+    builtinRef: true,
+  })
 
   return {
-    props: { content: res },
+    props: { content },
   }
 }
 
 export default function Page({ content }) {
-  const list = content?.list
+  const list = content?.list ?? []
 
-  // Always guard for null/undefined values
-  if (!list || list.length === 0) {
+  if (list.length === 0) {
     return <main>No content yet.</main>
   }
 
   return (
     <main>
-      {list.map((item) => {
-        const title = item?.body?.title ?? 'Untitled'
-        return <article key={item?.id}>{title}</article>
-      })}
+      {list.map((item) => (
+        <article key={item.id}>{item.body?.title ?? "Untitled"}</article>
+      ))}
     </main>
   )
 }
 ```
 
-Guidelines:
-- The first argument to `ListContent` is the collection name (for example `'blogs'`).
-- The second argument is an options object; typical fields include `page` and `offset`.
-- The return shape includes at least `total` and `list`; treat `list` as optional.
+Notes:
+- `listContents` returns `{ list?: T[]; total?: number }`.
+- `searchKey`, `orderBy`, `builtinRef`, and `filter` are supported in addition
+  to `limit` and `offset`.
+- `builtinRef: true` is useful when you need built-in reference fields resolved.
 
-## Getting a Single Content Item
+## Filter content
 
-Use `GetContent` when you need one specific item, for example a blog detail page.
+Use `filter` when you need structured server-side filtering.
 
 ```ts
-import { GetContent } from 'talizen/cms'
+const content = await listContents<Blogs>("blogs", {
+  limit: 10,
+  filter: {
+    match: "all",
+    conditions: [
+      { fieldId: "status", operator: "eq", value: "published" },
+      { fieldId: "category", operator: "eq", value: "news" },
+    ],
+  },
+})
+```
+
+## Get a single item
+
+Use `getContent` when you need one content item by `slug`.
+
+```ts
+import { getContent } from "talizen/cms"
+import type { Blogs } from "./types/cms"
 
 export async function getServerSideProps(context) {
   const slug = context.params?.slug
-  const res = await GetContent('blogs', slug)
+  const content = await getContent<Blogs>("blogs", slug, {
+    builtinRef: true,
+  })
 
   return {
-    props: { content: res },
+    props: { content },
   }
-}
-
-export default function Page({ content }) {
-  const title = content?.body?.title ?? 'Untitled'
-  const body = content?.body?.content ?? ''
-
-  return (
-    <main>
-      <h1>{title}</h1>
-      <div>{body}</div>
-    </main>
-  )
 }
 ```
 
-Guidelines:
-- The first argument is the collection name; the second is the identifier (for example `slug` from the route).
-- Always treat `content` and nested fields as optional; use `?.` and default values.
+Notes:
+- The second argument is the item `slug`.
+- `getContent` returns a single typed item, not a `{ list, total }` wrapper.
 
-## General CMS Best Practices
+## Get current item with prev/next
 
-- Keep CMS access inside `getServerSideProps`, and pass plain serializable props into the page component.
-- Use optional chaining (`?.`) for all CMS-derived fields to avoid runtime errors when fields are missing.
-- Provide user-friendly fallbacks (for example “Untitled”, “No content yet”, or empty strings).
-- Avoid assuming specific schema fields beyond what is clearly documented in the project; if unsure, inspect existing code or sample responses before using new fields.
+Use `getContentWithPrevNext` for article detail pages that need adjacent items.
 
+```ts
+import { getContentWithPrevNext } from "talizen/cms"
+import type { Blogs } from "./types/cms"
+
+const article = await getContentWithPrevNext<Blogs>("blogs", slug, {
+  prev: true,
+  next: true,
+  orderBy: "createdAt desc",
+})
+```
+
+Return shape:
+
+```ts
+{
+  current?: Blogs
+  next?: Blogs
+  prev?: Blogs
+}
+```
+
+## General CMS guidelines
+
+- Keep CMS requests in `getServerSideProps` unless the project has a clear
+  alternative data-loading pattern.
+- Always use the generated schema in `/types/cms.d.ts` for content shape.
+- Use optional chaining for nested fields, especially `body`.
+- Do not rely on old helper names from legacy docs.
