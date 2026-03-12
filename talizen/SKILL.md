@@ -7,7 +7,7 @@ description: Guidance for building and configuring apps on the Talizen platform.
 
 ## Overview
 
-This skill explains how to work inside the Talizen site builder from code: how to configure `talizen.config.ts`, respect the custom runtime and file-based routing rules, use the `talizen/cms` APIs, wire third-party imports via `importMap`, and correctly set up SEO using the `metadata` pattern. It also documents Talizen-specific tool usage (`diff_patch_file`, `lint`, `create_version`) and reply rules for the built-in AI assistant.
+This skill explains how to work inside the Talizen site builder from code: how to configure `talizen.config.ts`, respect the custom runtime and file-based routing rules, use the `talizen/cms` and `talizen/form` APIs, wire third-party imports via `importMap`, and correctly set up SEO using the `metadata` pattern. It also documents Talizen-specific tool usage (`diff_patch_file`, `lint`, `create_version`) and reply rules for the built-in AI assistant.
 
 Talizen apps are built with React components and a root configuration file `talizen.config.ts`. SEO is configured in two layers: global site-level metadata in `talizen.config.ts` and page-level metadata exported from each page component file.
 
@@ -40,6 +40,7 @@ you should:
 3. For SEO, prefer using the `metadata` field in `talizen.config.ts` plus per-page `export const metadata` instead of ad-hoc `seo` fields or raw `<meta>` tags.
 4. For page-specific SEO, open the page component (for example `Page.tsx`/`PAGE.tsx`) and add or edit its exported `metadata`.
 5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props.
+6. For form submission, use `talizen/form` and read `/types/form.d.ts` before wiring payload fields.
 6. Keep styling in Tailwind v4 utility classes; do not introduce inline styles or separate CSS files.
 
 ## CMS Usage (`talizen/cms`)
@@ -53,6 +54,18 @@ High-level rules:
 
 For full examples and patterns, see:
 - `references/CMS.md`
+
+## Form Usage (`talizen/form`)
+
+Talizen provides a Form client via the `talizen/form` package. Use it when a page needs to submit a named form payload back to the platform.
+
+High-level rules:
+- Read `/types/form.d.ts` before writing form code so you know the exact `key` and payload shape.
+- Import the payload type from `./types/form` and keep the submitted data aligned with that type.
+- Use the stable form `key` from the editor, not the display name.
+
+For full examples and patterns, see:
+- `references/FORM.md`
 
 ## talizen.config.ts Basics
 
