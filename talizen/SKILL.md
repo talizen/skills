@@ -135,9 +135,8 @@ When users want to add or update third-party libraries:
 export default {
   importMap: {
     imports: {
-      react: 'https://cdn.example/react@19',
+      'framer-motion': 'https://esm.sh/framer-motion',
       foo: 'https://cdn.example/foo',
-      'lucide-react': 'https://esm.sh/lucide-react',
     },
   },
 }
@@ -151,6 +150,8 @@ import { AlertCircle } from 'lucide-react'
 
 Keep importMap clean:
 - Only add packages that are actually used.
+- Prefer `esm.sh` as the package CDN/provider unless there is a clear compatibility reason to use something else.
+- Do not add `react` or `react-dom` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues.
 - Update URLs carefully when bumping versions.
 
 ## Styling Rules (Tailwind v4)
