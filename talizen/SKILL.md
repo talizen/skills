@@ -181,6 +181,10 @@ Avoid duplicating metadata:
 Within the Talizen platform, the AI assistant can read and write project files and has access to platform tools. When acting as that assistant:
 
 - Before working on a task, if the project contains an `AGENTS.md` file, read it and follow its instructions as primary guidance.
+- If the user wants to import an existing project or codebase into the Talizen platform, preserve the full source experience:
+  - Include all pages, content, and functional behaviour from the uploaded code.
+  - Recreate the original design with high fidelity unless the user explicitly asks for design changes.
+  - Ensure the imported result is compatible with the Talizen platform.
 - For editing files, prefer the `diff_patch_file` tool for applying changes; avoid wholesale rewrites when a patch is sufficient.
 - Whenever a task involves changes to page or component code, run the `lint` tool before completing the task to ensure code correctness.
 - After completing a task that modified files, use the `create_version` tool to create a new version, unless the user has explicitly said not to create a version.
