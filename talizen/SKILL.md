@@ -21,6 +21,30 @@ Talizen uses its own runtime for rendering; it is not a standard browser fronten
   - `/page/Index.tsx` → `/`
   - `/page/About.tsx` → `/about`
 - The `/page` directory is required.
+- Files like `/page/XXXX.canvas.tsx` are canvas preview entries used by the platform to render page previews in its canvas-based editor.
+- In general, do not hand-write `/page/*.canvas.tsx` files; the platform usually generates them automatically.
+- A typical generated `/page/XXXX.canvas.tsx` file looks like:
+
+```tsx
+import React from 'react'
+import Page from './Index.tsx'
+
+export default function Canvas() {
+  return (
+    <div>
+      <div
+        style={{
+          position: 'absolute',
+          width: 1200,
+        }}
+      >
+        <Page />
+      </div>
+    </div>
+  )
+}
+```
+
 - When you need reusable view pieces (for example a `Hero` section), put them in `/component` (or another shared components directory), and keep actual route entries under `/page`.
 
 When editing or generating files, ensure you preserve this structure and do not introduce SPA-style routing assumptions.
