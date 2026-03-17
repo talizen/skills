@@ -70,7 +70,7 @@ Guidelines:
 
 ## Page-Level Metadata (PAGE.tsx / Page.tsx)
 
-Each page can export its own `metadata` object. This metadata participates in merge rules with the site-level metadata.
+Each page can export its own `metadata` object, or export `generateMetadata` for dynamic values. Both participate in merge rules with the site-level metadata. Prefer `generateMetadata` when page SEO depends on route params or query data.
 
 ```tsx
 // PAGE.tsx or Page.tsx
@@ -82,6 +82,26 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return <main>...</main>
+}
+```
+
+Dynamic example:
+
+```tsx
+// PAGE.tsx or Page.tsx
+import type { Metadata } from 'next'
+import { getContent } from 'talizen/cms'
+import type { Blogs } from './types/cms'
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const content = await getContent<Blogs>('blogs', params.slug, {
+    builtinRef: true,
+  })
+
+  return {
+    title: content?.body?.title ?? params.slug,
+    description: content?.body?.description ?? 'Blog detail page',
+  }
 }
 ```
 

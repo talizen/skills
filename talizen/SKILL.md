@@ -61,9 +61,9 @@ you should:
 
 1. Locate the project root `talizen.config.ts`.
 2. For third-party libraries, update `importMap.imports` with the correct CDN URL.
-3. For SEO, prefer using the `metadata` field in `talizen.config.ts` plus per-page `export const metadata` instead of ad-hoc `seo` fields or raw `<meta>` tags.
-4. For page-specific SEO, open the page component (for example `Page.tsx`/`PAGE.tsx`) and add or edit its exported `metadata`.
-5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props.
+3. For SEO, prefer using the `metadata` field in `talizen.config.ts` plus per-page `export const metadata` or `export async function generateMetadata(...)` instead of ad-hoc `seo` fields or raw `<meta>` tags.
+4. For page-specific SEO, open the page component (for example `Page.tsx`/`PAGE.tsx`) and add or edit its exported `metadata` or `generateMetadata`.
+5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props. When content does not exist, return `notFound: true`; when access or routing should change, return a `redirect`.
 6. For form submission, use `talizen/form` and read `/types/form.d.ts` before wiring payload fields.
 6. Keep styling in Tailwind v4 utility classes; do not introduce inline styles or separate CSS files.
 
@@ -72,9 +72,37 @@ you should:
 Talizen provides a CMS client via the `talizen/cms` package. Use it inside `getServerSideProps` to fetch content for pages, then pass the results into the page as props.
 
 High-level rules:
-- Use `ListContent` for lists (for example blog indexes) and `GetContent` for single items (for example blog detail pages).
+- Use `listContents` for lists (for example blog indexes) and `getContent` for single items (for example blog detail pages).
 - Always treat CMS data as optional; use optional chaining (`?.`) and provide user-friendly fallbacks.
 - Keep CMS access in `getServerSideProps` and pass plain serializable props to the page component.
+
+Example patterns:
+
+```ts
+export async function getServerSideProps(context) {
+  const slug = context.params?.slug
+  const content = slug ? await getContent("blogs", slug) : null
+
+  if (!content) {
+    return {
+      notFound: true,
+    }
+  }
+
+  if (content.body?.redirectTo) {
+    return {
+      redirect: {
+        destination: content.body.redirectTo,
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: { content },
+  }
+}
+```
 
 For full examples and patterns, see:
 - `references/CMS.md`
