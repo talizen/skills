@@ -130,7 +130,7 @@ Talizen supports a root configuration file `talizen.config.ts` to control:
 
 ```ts
 // talizen.config.ts
-import type { Metadata } from 'next'
+import type { Metadata } from 'talizen'
 
 export default {
   importMap: {
@@ -203,7 +203,7 @@ import { AlertCircle } from 'lucide-react'
 Keep importMap clean:
 - Only add packages that are actually used.
 - Prefer `esm.sh` as the package CDN/provider unless there is a clear compatibility reason to use something else.
-- Do not add `react` or `react-dom` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues.
+- Do not add `react` or `react-dom` or `talizen` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues; Instead, you should add ?external syntax to packages that depend on react, such as 'https://esm.sh/framer-motion@12.34.5?external=react'
 - Update URLs carefully when bumping versions.
 
 ## Styling Rules (Tailwind v4)
@@ -240,7 +240,9 @@ Within the Talizen platform, the AI assistant can read and write project files a
   - Ensure the imported result is compatible with the Talizen platform.
 - For editing files, prefer the `diff_patch_file` tool for applying changes; avoid wholesale rewrites when a patch is sufficient.
 - Whenever a task involves changes to page or component code, run the `lint` tool before completing the task to ensure code correctness.
-- After completing a task that modified files, use the `create_version` tool to create a new version, unless the user has explicitly said not to create a version.
+- Before modified files, use the `create_version` tool to create a new version, can be used to roll back this change.
+- After completing a task that modified files, use the `create_version` tool to create a new version.
+- A task will create at most two versions (before and after the modified file)
 
 Treat these tools as the standard workflow: plan changes, patch files, lint, then version.
 

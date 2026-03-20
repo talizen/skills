@@ -27,7 +27,7 @@ Site-wide defaults are defined in `talizen.config.ts`:
 
 ```ts
 // talizen.config.ts
-import type { Metadata } from 'next'
+import type { Metadata } from 'talizen'
 
 export default {
   metadata: {
@@ -74,7 +74,7 @@ Each page can export its own `metadata` object, or export `generateMetadata` for
 
 ```tsx
 // PAGE.tsx or Page.tsx
-import type { Metadata } from 'next'
+import type { Metadata } from 'talizen'
 
 export const metadata: Metadata = {
   description: 'The React Framework for the Web',
@@ -89,7 +89,7 @@ Dynamic example:
 
 ```tsx
 // PAGE.tsx or Page.tsx
-import type { Metadata } from 'next'
+import type { Metadata } from 'talizen'
 import { getContent } from 'talizen/cms'
 import type { Blogs } from './types/cms'
 
@@ -277,7 +277,7 @@ Migration steps:
 Example migrated config:
 
 ```ts
-import type { Metadata } from 'next'
+import type { Metadata } from 'talizen'
 
 export default {
   importMap: {
