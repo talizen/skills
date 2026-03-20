@@ -79,12 +79,10 @@ export interface ListContentParams {
   offset?: number
   searchKey?: string
   orderBy?: string
-  builtinRef?: boolean
   filter?: GetContentListFilter
 }
 
 export interface GetContentParams {
-  builtinRef?: boolean
 }
 
 export interface GetContentWithPrevNextParams extends GetContentParams {
@@ -148,7 +146,6 @@ export async function getServerSideProps() {
     limit: 10,
     offset: 0,
     orderBy: "createdAt desc",
-    builtinRef: true,
   })
 
   return {
@@ -175,9 +172,8 @@ export default function Page({ content }) {
 
 Notes:
 - `listContents` returns `{ list?: T[]; total?: number }`.
-- `searchKey`, `orderBy`, `builtinRef`, and `filter` are supported in addition
+- `searchKey`, `orderBy`, and `filter` are supported in addition
   to `limit` and `offset`.
-- `builtinRef: true` is useful when you need built-in reference fields resolved.
 
 ## Filter content
 
@@ -207,7 +203,6 @@ import type { Blogs } from "./types/cms"
 export async function getServerSideProps(context) {
   const slug = context.params?.slug
   const content = await getContent<Blogs>("blogs", slug, {
-    builtinRef: true,
   })
 
   return {
@@ -249,6 +244,7 @@ Return shape:
 
 - Keep CMS requests in `getServerSideProps` unless the project has a clear
   alternative data-loading pattern.
-- Always use the generated schema in `/types/cms.d.ts` for content shape.
+- Always use the generated schema in `/types/cms.d.ts` for content shape. (!DON'T EDIT IT)
 - Use optional chaining for nested fields, especially `body`.
 - Do not rely on old helper names from legacy docs.
+- When updating and creating content, follow the jsonSchema definition of the cms collection
