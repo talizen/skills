@@ -136,3 +136,148 @@ await submitForm("form-token", {
 - Use a token when the integration gives you a token instead of a stable form
   key.
 - Show explicit success and error UI states after submission.
+
+## Talizen AI Form operations
+
+When running inside Talizen's built-in AI assistant, use the platform tools
+below to inspect forms and create new form definitions:
+
+### `list_form()`
+
+List all forms in the current project.
+
+Typical use:
+- Discover available form keys.
+- Confirm form names and schema before coding.
+
+Response shape:
+
+```json
+{
+  "total": 1,
+  "list": [
+    {
+      "id": "123",
+      "key": "contact-form",
+      "name": "Contact form",
+      "desc": "",
+      "created_at": "2026-04-02 12:30:00",
+      "updated_at": "2026-04-02 12:30:00",
+      "json_schema": {}
+    }
+  ]
+}
+```
+
+### `create_form({ key, name, desc?, json_schema? })`
+
+Create a new form in the current project.
+
+Input example:
+
+```json
+{
+  "key": "contact-form",
+  "name": "Contact form",
+  "desc": "Contact entry from site footer",
+  "json_schema": {
+    "type": "object",
+    "properties": {
+      "email": { "type": "string" },
+      "message": { "type": "string" }
+    },
+    "required": ["email"]
+  }
+}
+```
+
+Response shape:
+
+```json
+{
+  "id": "123"
+}
+```
+
+> Note: form log tools may be temporarily unavailable depending on platform
+> registration strategy.
+
+### (Temporarily disabled) `list_form_log({ key, limit?, offset? })`
+
+List submission logs for a specific form key.
+
+Input example:
+
+```json
+{
+  "key": "contact-form",
+  "limit": 20,
+  "offset": 0
+}
+```
+
+Response shape:
+
+```json
+{
+  "total": 2,
+  "list": [
+    {
+      "id": "456",
+      "form_id": "123",
+      "uid": "u_abc",
+      "ua": "Mozilla/5.0",
+      "ip": "127.0.0.1",
+      "form_url": "/contact",
+      "body": {
+        "email": "taylor@example.com",
+        "message": "Hello"
+      },
+      "created_at": "2026-04-02 12:35:00",
+      "updated_at": "2026-04-02 12:35:00"
+    }
+  ]
+}
+```
+
+### (Temporarily disabled) `get_form_log({ key, id })`
+
+Get one specific submission log by form key and log id.
+
+Input example:
+
+```json
+{
+  "key": "contact-form",
+  "id": "456"
+}
+```
+
+Response shape:
+
+```json
+{
+  "item": {
+    "id": "456",
+    "form_id": "123",
+    "uid": "u_abc",
+    "ua": "Mozilla/5.0",
+    "ip": "127.0.0.1",
+    "form_url": "/contact",
+    "body": {
+      "email": "taylor@example.com",
+      "message": "Hello"
+    },
+    "created_at": "2026-04-02 12:35:00",
+    "updated_at": "2026-04-02 12:35:00"
+  }
+}
+```
+
+If the form key or log id is not found, the tool may return an `error` field in
+the response.
+
+### Recommended order in AI tasks
+
+1. Call `list_form()` first to discover existing form keys.
+2. Call `create_form({...})` when a new form is required.

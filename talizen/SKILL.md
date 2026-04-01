@@ -17,9 +17,12 @@ Talizen uses its own runtime for rendering; it is not a standard browser fronten
 
 - This is a **file-based website system**. All pages are React components written in `.tsx` files.
 - The project is **not** a React single-page app. Do **not** use `react-router-dom` or similar client-side routing libraries.
-- Routing is derived from the `/page` directory（NextJs-style）:
+- Routing is derived from the `/page` directory by Talizen conventions (similar naming style, but not Next.js APIs):
   - `/page/Index.tsx` → `/`
   - `/page/About.tsx` → `/about`
+- For route navigation, use native anchors like `<a href="/about">...</a>`. Do not import `Link` from `talizen` or `next/link`.
+- For dynamic route data, prefer SSR via `getServerSideProps(context)` and read `context.params`. Do not use `useParams` from `talizen/router`.
+- For data needed at first render (especially CMS/form-driven page content), fetch in `getServerSideProps` instead of client-side `useEffect` fetch loops.
 - The `/page` directory is required.
 - Files like `/page/XXXX.canvas.tsx` are canvas preview entries used by the platform to render page previews in its canvas-based editor.
 - In general, do not hand-write `/page/*.canvas.tsx` files; the platform usually generates them automatically.
@@ -49,6 +52,19 @@ export default function Canvas() {
 
 When editing or generating files, ensure you preserve this structure and do not introduce SPA-style routing assumptions.
 
+### Routing anti-patterns (must avoid)
+
+- Do not use Next.js route/runtime APIs such as `next/link`, `next/router`, `next/navigation`, `getStaticProps`, or `getStaticPaths`.
+- Do not use `react-router-dom` APIs (`BrowserRouter`, `Routes`, `Route`, `useNavigate`, `Link`, `useParams`).
+- Do not import `Link` from `talizen`; use `<a href>` directly.
+- Do not rely on client-side param parsing for page identity when SSR params are available.
+
+### Route path mapping notes
+
+- For non-`Index` page files, route path follows Talizen file-name mapping, not kebab-case guessing.
+- Example: `/page/BlockElementsPage.tsx` should be treated as `/blockelementspage` (and may also be accessible as `/BlockElementsPage` depending on runtime behavior).
+- When generating links, prefer the lowercase canonical path returned by lint/validation (for example `/blockelementspage`).
+
 ## Quick Start
 
 When a user asks things like:
@@ -65,7 +81,7 @@ you should:
 4. For page-specific SEO, open the page component (for example `Page.tsx`/`PAGE.tsx`) and add or edit its exported `metadata` or `generateMetadata`.
 5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props. When content does not exist, return `notFound: true`; when access or routing should change, return a `redirect`.
 6. For form submission, use `talizen/form` and read `/types/form.d.ts` before wiring payload fields.
-6. Keep styling in Tailwind v4 utility classes; do not introduce inline styles or separate CSS files.
+7. Keep styling in Tailwind v4 utility classes; do not introduce inline styles or separate CSS files.
 
 ## CMS Usage (`talizen/cms`)
 
@@ -115,6 +131,7 @@ High-level rules:
 - Read `/types/form.d.ts` before writing form code so you know the exact `key` and payload shape.
 - Import the payload type from `./types/form` and keep the submitted data aligned with that type.
 - Use the stable form `key` from the editor, not the display name.
+- In Talizen AI tools, use `list_form()` to inspect forms and `create_form({...})` to create new forms.
 
 For full examples and patterns, see:
 - `references/FORM.md`
