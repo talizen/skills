@@ -5,7 +5,7 @@ title: Talizen CMS Usage
 # Talizen CMS Usage
 
 This document describes the current CMS API exported by `talizen/cms`.
-It is based on the latest npm package definitions from `talizen@0.0.7`.
+It is based on the latest npm package definitions from `talizen`.
 
 Use your project's `/types/cms.d.ts` as the schema source of truth, and use
 `talizen/cms` for the platform-level fetch helpers.
@@ -13,6 +13,8 @@ Use your project's `/types/cms.d.ts` as the schema source of truth, and use
 ## types/cms.d.ts file
 
 You can find all CMS schema definitions in `/types/cms.d.ts`.
+
+NOTE: This file is system-generated and cannot be edited, Call `create_collection` tool when a new cms collection is required. This file will be updated upon successful collection creation.
 
 Rules:
 1. Read this file before writing CMS-related code.
@@ -51,7 +53,7 @@ export interface Blogs {
 
 ## talizen/cms package definition
 
-`talizen@0.0.7` currently exports the following CMS types:
+`talizen` currently exports the following CMS types:
 
 ```ts
 import { type TalizenRequestOptions } from "talizen/core"
@@ -244,7 +246,7 @@ Return shape:
 
 - Keep CMS requests in `getServerSideProps` unless the project has a clear
   alternative data-loading pattern.
-- Always use the generated schema in `/types/cms.d.ts` for content shape. (!DON'T EDIT IT)
+- Always use the generated schema in `/types/cms.d.ts` for content shape. (This file is system-generated and cannot be edited)
 - Use optional chaining for nested fields, especially `body`.
 - Do not rely on old helper names from legacy docs.
 - When updating and creating content, follow the jsonSchema definition of the cms collection
