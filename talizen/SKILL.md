@@ -81,7 +81,7 @@ you should:
 4. For page-specific SEO, open the page component (for example `Page.tsx`/`PAGE.tsx`) and add or edit its exported `metadata` or `generateMetadata`.
 5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props. When content does not exist, return `notFound: true`; when access or routing should change, return a `redirect`.
 6. For form submission, use `talizen/form` and read `/types/form.d.ts` before wiring payload fields.
-7. Keep styling in Tailwind v4 utility classes; do not introduce inline styles or separate CSS files.
+7. Keep styling in Tailwind v4 utility classes; do not introduce inline styles. For site-wide Tailwind v4 directives (`@theme`, `@utility`, `@layer`, etc.), use the platform-supported site file `/index.css` (see `references/INDEX_CSS.md`); do not add arbitrary extra CSS files outside that convention.
 
 ## CMS Usage (`talizen/cms`)
 
@@ -228,7 +228,8 @@ Keep importMap clean:
 Talizen uses Tailwind CSS v4 built-in. Follow these rules:
 
 - Use Tailwind utility classes for styling.
-- Do not use inline styles (`style` props), separate CSS files, or `<style>` tags.
+- Do not use inline styles (`style` props) or ad-hoc `<style>` tags in page components.
+- **Site-level CSS:** The preview loads an optional site root file **`/index.css`** (and optionally `tailwindCss` from `talizen.config.ts`) into the iframe as Tailwind source (`type="text/tailwindcss"`). Use this for theme tokens, shared utilities, and base layers—not for one-off component styling. See **`references/INDEX_CSS.md`** for conventions, merge order, and examples.
 - When adding transitions on color, ensure the color is driven from a single source to avoid “double transitions”:
   - Bad: parent changes text color on hover and child also has its own hover color, causing a jarring effect.
   - Good: either keep the child color fixed and let it inherit the parent change, or control the child color only via a single hover/group-hover rule.
@@ -271,10 +272,11 @@ The end user of the Talizen AI assistant is typically non-technical:
 - Do not show internal tool outputs (`diff_patch_file`, `lint`, `create_version`) directly to the user.
 - Communicate in product and content terms: describe what changed on the site, how the page behaves, and what the user can do next, instead of describing implementation details.
 
-## Resources (optional)
+## Resources
 
 Current references:
 
 - `references/SEO.md` — full SEO and `metadata` configuration guide for `talizen.config.ts` and per-page metadata, including merge rules and migration from legacy `seo` configs.
+- `references/CSS.md` — site-level `/index.css`: How to configure Tailwind v4 and write custom styles.
 
 Add more reference or script files under `references/` or `scripts/` only when Talizen introduces new runtime behaviours or tools that require detailed documentation or automation.
