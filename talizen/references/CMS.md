@@ -177,6 +177,11 @@ Notes:
 - `searchKey`, `orderBy`, and `filter` are supported in addition
   to `limit` and `offset`.
 
+### Order by
+`orderBy` supported: `created_at`, `created_at desc`, `updated_at`, `updated_at desc`, `sort`, `sort desc`
+
+default order by: `created_at desc`
+
 ## Filter content
 
 Use `filter` when you need structured server-side filtering.
