@@ -18,8 +18,62 @@ Both support standard Next.js metadata fields, including:
 - `title`, `description`, `keywords`, `creator`, `publisher`, `applicationName`, `generator`, `referrer`
 - `formatDetection`
 - `openGraph` (with `title`, `description`, `url`, `siteName`, `images`, `videos`, `audio`, `locale`, `type`)
+- `icons` (favicons and touch icons — see below)
 
-Talizen converts these structured fields into `<title>`, `<meta>` and Open Graph tags in the rendered HTML.
+Talizen converts these structured fields into `<title>`, `<meta>`, `<link rel="…" href="…">`, and Open Graph tags in the rendered HTML.
+
+## Icons (`metadata.icons`)
+
+`icons` follows the Next.js `Metadata.icons` shape. Talizen emits `<link>` tags in this order: **shortcut** → **icon** → **apple-touch-icon** → **other** (custom `rel`).
+
+Each of `shortcut`, `icon`, and `apple` may be:
+- a string URL (or path),
+- a single object `{ url, media?, sizes?, type? }`,
+- or an array mixing strings and objects.
+
+`other` may be a single `{ rel, url }` or an array of such objects.
+
+Example (simple):
+
+```ts
+export const metadata = {
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/shortcut-icon.png',
+    apple: '/apple-icon.png',
+    other: {
+      rel: 'apple-touch-icon-precomposed',
+      url: '/apple-touch-icon-precomposed.png',
+    },
+  },
+}
+```
+
+Example (arrays, media, sizes):
+
+```ts
+export const metadata = {
+  icons: {
+    icon: [
+      { url: '/icon.png' },
+      { url: '/icon-dark.png', media: '(prefers-color-scheme: dark)' },
+    ],
+    shortcut: ['/shortcut-icon.png'],
+    apple: [
+      { url: '/apple-icon.png' },
+      { url: '/apple-icon-x3.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      {
+        rel: 'apple-touch-icon-precomposed',
+        url: '/apple-touch-icon-precomposed.png',
+      },
+    ],
+  },
+}
+```
+
+Merge rule with site-level `metadata.icons`: each slot (`shortcut`, `icon`, `apple`, `other`) is replaced by the page when that slot is non-empty on the page; otherwise the site default for that slot is kept.
 
 ## Site-Level Metadata (`talizen.config.ts`)
 
