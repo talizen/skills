@@ -1,6 +1,6 @@
 ---
 name: talizen
-description: Guidance for building and configuring apps on the Talizen platform. Use this skill when working with Talizen projects, especially when editing `talizen.config.ts`, configuring file-based routes and CMS, enforcing Tailwind v4 styling rules, setting up SEO and `metadata`, or following platform-specific tool and reply conventions.
+description: Guidance for building and configuring apps on the Talizen platform. Use this skill when working with Talizen platform, especially when editing `talizen.config.ts`, configuring file-based routes and CMS, enforcing Tailwind v4 styling rules, setting up SEO and `metadata`, or following platform-specific tool and reply conventions.
 ---
 
 # Talizen
@@ -220,8 +220,10 @@ import { AlertCircle } from 'lucide-react'
 Keep importMap clean:
 - Only add packages that are actually used.
 - Prefer `esm.sh` as the package CDN/provider unless there is a clear compatibility reason to use something else.
-- Do not add `react` or `react-dom` or `talizen` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues; Instead, you should add ?external syntax to packages that depend on react, such as 'https://esm.sh/framer-motion@12.34.5?external=react'
+- Do not add `react` or `react-dom` or `talizen` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues. For React-dependent packages from esm.sh, use `?external=react` on the URL (for example `'https://esm.sh/framer-motion@12.34.5?external=react'`) so the module uses the host React instead of bundling another copy.
 - Update URLs carefully when bumping versions.
+
+If you see `TypeError: Cannot read properties of null (reading 'useState')` with a stack that mentions both `react.mjs` and a third-party module from esm.sh, that is usually duplicate React: add `?external=react` to that package’s import URL (subpaths that ship React wrappers often need it), for example `'swiper/react': 'https://esm.sh/swiper@11/react?external=react'`.
 
 ## Styling Rules (Tailwind v4)
 
