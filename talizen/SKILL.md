@@ -1,6 +1,9 @@
 ---
 name: talizen
-description: Guidance for building and configuring apps on the Talizen platform. Use this skill when working with Talizen platform, especially when editing `talizen.config.ts`, configuring file-based routes and CMS, enforcing Tailwind v4 styling rules, setting up SEO and `metadata`, or following platform-specific tool and reply conventions.
+description: >
+  Guidance for Talizen platform apps. Read this skill before editing project files
+  or giving Talizen-specific advice (talizen.config.ts, /page routes, CMS/form, Tailwind v4,
+  SEO/metadata, importMap, platform tools). Not required for greetings or non-project chat.
 ---
 
 # Talizen
