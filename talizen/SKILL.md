@@ -207,6 +207,10 @@ Keep importMap clean:
 
 If you see `TypeError: Cannot read properties of null (reading 'useState')` with a stack that mentions both `react.mjs` and a third-party module from esm.sh, that is usually duplicate React: add `?external=react` to that package’s import URL (subpaths that ship React wrappers often need it), for example `'swiper/react': 'https://esm.sh/swiper@11/react?external=react'`.
 
+## Carousel & Slideshow
+
+For slideshow or carousel requirements, follow `references/CAROUSEL.md` as the primary guide for recommended package setup and usage patterns.
+
 ## Styling Rules (Tailwind v4)
 
 Talizen uses Tailwind CSS v4 built-in. Follow these rules:
