@@ -50,6 +50,7 @@ When editing or generating files, ensure you preserve this structure and do not 
 ## Quick Start
 
 When a user asks things like:
+
 - “在 Talizen 里帮我优化页面的 SEO 标题和描述”
 - “给这个项目加上 framer-motion 依赖”
 - “在页面里设置 Open Graph 信息”
@@ -65,11 +66,12 @@ you should:
 6. For form submission, use `talizen/form` and read `/types/form.d.ts` before wiring payload fields.
 7. Keep styling in Tailwind v4 utility classes; do not introduce inline styles. For site-wide Tailwind v4 directives (`@theme`, `@utility`, `@layer`, etc.), use the platform-supported site file `/index.css` (see `references/INDEX_CSS.md`); do not add arbitrary extra CSS files outside that convention.
 
-## CMS Usage (`talizen/cms`)
+## CMS Usage
 
 Talizen provides a CMS client via the `talizen/cms` package. Use it inside `getServerSideProps` to fetch content for pages, then pass the results into the page as props.
 
 High-level rules:
+
 - Use `listContents` for lists (for example blog indexes) and `getContent` for single items (for example blog detail pages).
 - Always treat CMS data as optional; use optional chaining (`?.`) and provide user-friendly fallbacks.
 - Keep CMS access in `getServerSideProps` and pass plain serializable props to the page component.
@@ -78,13 +80,13 @@ Example patterns:
 
 ```ts
 export async function getServerSideProps(context) {
-  const slug = context.params?.slug
-  const content = slug ? await getContent("blogs", slug) : null
+  const slug = context.params?.slug;
+  const content = slug ? await getContent("blogs", slug) : null;
 
   if (!content) {
     return {
       notFound: true,
-    }
+    };
   }
 
   if (content.body?.redirectTo) {
@@ -93,34 +95,39 @@ export async function getServerSideProps(context) {
         destination: content.body.redirectTo,
         permanent: false,
       },
-    }
+    };
   }
 
   return {
     props: { content },
-  }
+  };
 }
 ```
 
 For full examples and patterns, see:
+
 - `references/CMS.md`
 
-## Form Usage (`talizen/form`)
+## Form Usage
 
 Talizen provides a Form client via the `talizen/form` package. Use it when a page needs to submit a named form payload back to the platform.
 
 High-level rules:
+
 - Read `/types/form.d.ts` before writing form code so you know the exact `key` and payload shape.
 - Import the payload type from `./types/form` and keep the submitted data aligned with that type.
 - Use the stable form `key` from the editor, not the display name.
 - In Talizen AI tools, use `list_form()` to inspect forms and `create_form({...})` to create new forms.
+- If you need to create a new form, see `references/FORM.md` for more details of json schema.
 
 For full examples and patterns, see:
+
 - `references/FORM.md`
 
 ## talizen.config.ts Basics
 
 Talizen supports a root configuration file `talizen.config.ts` to control:
+
 - Third-party dependencies via `importMap`
 - Global SEO via `metadata`
 - Arbitrary custom code snippets injected into `<head>` / `<body>` via `customCode`
@@ -129,30 +136,31 @@ Talizen supports a root configuration file `talizen.config.ts` to control:
 
 ```ts
 // talizen.config.ts
-import type { Metadata } from 'talizen'
+import type { Metadata } from "talizen";
 
 export default {
   importMap: {
     imports: {
       // Example: add external packages
-      'framer-motion': 'https://esm.sh/framer-motion',
-      'lucide-react': 'https://esm.sh/lucide-react',
+      "framer-motion": "https://esm.sh/framer-motion",
+      "lucide-react": "https://esm.sh/lucide-react",
     },
   },
   customCode: {
-    head: '<script>window.__HEAD__=1</script>',
-    body: '<script>window.__BODY__=1</script>',
+    head: "<script>window.__HEAD__=1</script>",
+    body: "<script>window.__BODY__=1</script>",
   },
   // Prefer using `metadata` instead of custom `seo` fields
   metadata: {
-    title: 'My Site',
-    description: 'My Site Description',
-    keywords: ['Next.js', 'React', 'JavaScript'],
+    title: "My Site",
+    description: "My Site Description",
+    keywords: ["Next.js", "React", "JavaScript"],
   } satisfies Metadata,
-}
+};
 ```
 
 Key points:
+
 - `importMap.imports` keys are module specifiers used in `import` statements; values are CDN URLs.
 - `customCode.head` / `customCode.body` are literal HTML strings injected into the document; keep them small and focused (analytics, verification tags, etc.).
 - Use `metadata` for SEO instead of ad-hoc `seo` fields.
@@ -160,10 +168,12 @@ Key points:
 ## SEO & Metadata Overview
 
 Talizen follows a two-level metadata model similar to Next.js:
+
 - Site-level metadata in `talizen.config.ts`
 - Page-level metadata exported from each page component file
 
 High-level behaviour:
+
 - Prefer `metadata` (global + per page) instead of ad-hoc `seo` fields.
 - Use `metadata.openGraph` for Open Graph data and `metadata.keywords` for keyword lists.
 - When both site and page define a title:
@@ -173,6 +183,7 @@ High-level behaviour:
 - Use absolute URLs for Open Graph images, videos, and audio.
 
 For complete field lists, examples, and migration guidance from legacy `seo` + custom `<meta>` tags to `metadata`, see:
+
 - `references/SEO.md`
 
 ## ImportMap Usage
@@ -186,20 +197,21 @@ When users want to add or update third-party libraries:
 export default {
   importMap: {
     imports: {
-      'framer-motion': 'https://esm.sh/framer-motion',
-      foo: 'https://cdn.example/foo',
+      "framer-motion": "https://esm.sh/framer-motion",
+      foo: "https://cdn.example/foo",
     },
   },
-}
+};
 ```
 
 3. In Talizen pages/components, import using the same specifier:
 
 ```tsx
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle } from "lucide-react";
 ```
 
 Keep importMap clean:
+
 - Only add packages that are actually used.
 - Prefer `esm.sh` as the package CDN/provider unless there is a clear compatibility reason to use something else.
 - Do not add `react` or `react-dom` or `talizen` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues. For React-dependent packages from esm.sh, use `?external=react` on the URL (for example `'https://esm.sh/framer-motion@12.34.5?external=react'`) so the module uses the host React instead of bundling another copy.
@@ -227,11 +239,13 @@ Express color transitions through a consistent set of Tailwind classes on the sa
 ## When to Use Custom Head/Body Code
 
 Use `customCode.head` / `customCode.body` for:
+
 - Analytics snippets
 - Third-party verification tags
 - Custom scripts that are not covered by `metadata`
 
 Avoid duplicating metadata:
+
 - Do not emit `<title>` or `<meta name="description">` manually when they are already covered by `metadata`.
 - Prefer structured `metadata` for anything that fits into the Next.js metadata schema; treat `<meta>` tags in `customCode` as a last resort.
 
