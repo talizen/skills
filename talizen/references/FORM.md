@@ -4,11 +4,9 @@ title: Talizen Form Usage
 
 # Talizen Form Usage
 
-This document describes the current Form API exported by `talizen/form`.
+This document explains how to use the `talizen/form` npm package to submit forms,
+and how to create complex forms in the Talizen system.
 It is based on the latest npm package definitions from `talizen`.
-
-Use `/types/form.d.ts` as the project schema source of truth, and use
-`talizen/form` for the submission helper.
 
 ## Build a Form
 
