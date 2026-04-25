@@ -3,7 +3,9 @@ name: talizen
 description: >
   Guidance for Talizen platform apps. Read this skill before editing project files
   or giving Talizen-specific advice (talizen.config.ts, /page routes, CMS/form, Tailwind v4,
-  SEO/metadata, importMap, platform tools). Not required for greetings or non-project chat.
+  SEO/metadata, importMap, platform tools). Examples: "Build a website for a coffee shop",
+  "Create an About page", "Preview this page", or "Preview this component". Not required for
+  greetings or non-project chat.
 ---
 
 # Talizen
@@ -75,34 +77,6 @@ High-level rules:
 - Use `listContents` for lists (for example blog indexes) and `getContent` for single items (for example blog detail pages).
 - Always treat CMS data as optional; use optional chaining (`?.`) and provide user-friendly fallbacks.
 - Keep CMS access in `getServerSideProps` and pass plain serializable props to the page component.
-
-Example patterns:
-
-```ts
-export async function getServerSideProps(context) {
-  const slug = context.params?.slug;
-  const content = slug ? await getContent("blogs", slug) : null;
-
-  if (!content) {
-    return {
-      notFound: true,
-    };
-  }
-
-  if (content.body?.redirectTo) {
-    return {
-      redirect: {
-        destination: content.body.redirectTo,
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { content },
-  };
-}
-```
 
 For full examples and patterns, see:
 
@@ -263,6 +237,7 @@ Within the Talizen platform, the AI assistant can read and write project files a
 - Before modified files, use the `create_version` tool to create a new version, can be used to roll back this change.
 - After completing a task that modified files, use the `create_version` tool to create a new version.
 - A task will create at most two versions (before and after the modified file)
+- If the user only asks for a component and does not ask for a page, avoid generating only a standalone component. A component alone cannot render as a visible page in the site. Whenever possible, place the component into a page so it can be previewed, especially when the user asks to preview the result.
 
 Treat these tools as the standard workflow: plan changes, patch files, lint, then version.
 
