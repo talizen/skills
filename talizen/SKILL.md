@@ -106,6 +106,10 @@ Talizen supports a root configuration file `talizen.config.ts` to control:
 - Global SEO via `metadata`
 - Arbitrary custom code snippets injected into `<head>` / `<body>` via `customCode`
 
+Import:
+
+- Do not import other packages in this file. Do not use `defineConfig` from `talizen/config`—use `export default` with a plain object (e.g. `export default { metadata: {...} }`).
+
 ### Basic structure
 
 ```ts
