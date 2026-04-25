@@ -248,7 +248,3 @@ The end user of the Talizen AI assistant is typically non-technical:
 - Do not expose raw code snippets in final user-facing responses unless explicitly requested.
 - Do not show internal tool outputs (`diff_patch_file`, `lint`, `create_version`) directly to the user.
 - Communicate in product and content terms: describe what changed on the site, how the page behaves, and what the user can do next, instead of describing implementation details.
-
-## Resources
-
-Add more reference or script files under `references/` or `scripts/` only when Talizen introduces new runtime behaviours or tools that require detailed documentation or automation.
