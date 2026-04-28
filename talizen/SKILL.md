@@ -61,7 +61,7 @@ When a user asks things like:
 you should:
 
 1. Locate the project root `talizen.config.ts`.
-2. For third-party libraries, update `importMap.imports` with the correct CDN URL.
+2. For third-party libraries, use `get_import_map()` when you need to inspect the final effective import map, and update `talizen.config.ts` only when adding or changing user-defined extra imports.
 3. For SEO, prefer using the `metadata` field in `talizen.config.ts` plus per-page `export const metadata` or `export async function generateMetadata(...)` instead of ad-hoc `seo` fields or raw `<meta>` tags.
 4. For page-specific SEO, open the page component (for example `Page.tsx`/`PAGE.tsx`) and add or edit its exported `metadata` or `generateMetadata`.
 5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props. When content does not exist, return `notFound: true`; when access or routing should change, return a `redirect`.
@@ -102,7 +102,7 @@ For full examples and patterns, see:
 
 Talizen supports a root configuration file `talizen.config.ts` to control:
 
-- Third-party dependencies via `importMap`
+- User-defined extra third-party dependencies via `importMap`
 - Global SEO via `metadata`
 - Arbitrary custom code snippets injected into `<head>` / `<body>` via `customCode`
 
@@ -139,6 +139,8 @@ export default {
 
 Key points:
 
+- `talizen.config.ts` contains only the user's extra `importMap.imports`; it is not necessarily the full import map used by the runtime.
+- Use `get_import_map()` when you need the final effective import map, including platform-provided imports plus user-defined extra imports.
 - `importMap.imports` keys are module specifiers used in `import` statements; values are CDN URLs.
 - `customCode.head` / `customCode.body` are literal HTML strings injected into the document; keep them small and focused (analytics, verification tags, etc.).
 - Use `metadata` for SEO instead of ad-hoc `seo` fields.
@@ -166,7 +168,12 @@ For complete field lists, examples, and migration guidance from legacy `seo` + c
 
 ## ImportMap Usage
 
-When users want to add or update third-party libraries:
+There are two import map views:
+
+- `get_import_map()` returns the final effective import map used by the Talizen runtime. Use it when resolving what imports are currently available, including platform-provided modules and user-defined entries.
+- `talizen.config.ts` contains only user-defined extra imports. Edit it when the user wants to add or update a custom third-party dependency.
+
+When users want to add or update user-defined third-party libraries:
 
 1. Open `talizen.config.ts`.
 2. Add or edit entries under `importMap.imports`:
@@ -192,6 +199,7 @@ Keep importMap clean:
 
 - Only add packages that are actually used.
 - Prefer `esm.sh` as the package CDN/provider unless there is a clear compatibility reason to use something else.
+- Do not treat the `importMap.imports` object in `talizen.config.ts` as the complete runtime import map; call `get_import_map()` for the complete effective mapping.
 - Do not add `react` or `react-dom` or `talizen` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues. For React-dependent packages from esm.sh, use `?external=react` on the URL (for example `'https://esm.sh/framer-motion@12.34.5?external=react'`) so the module uses the host React instead of bundling another copy.
 - Update URLs carefully when bumping versions.
 
