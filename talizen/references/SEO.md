@@ -141,6 +141,9 @@ export default function Page() {
 
 Dynamic example:
 
+This uses the stable CMS helper `getContent`. Fetch module types only if you
+need exact signatures or validation reports a mismatch.
+
 ```tsx
 // PAGE.tsx or Page.tsx
 import type { Metadata } from 'talizen'

@@ -4,8 +4,9 @@ title: Talizen CMS Usage
 
 # Talizen CMS Usage
 
-This document describes the current CMS API exported by `talizen/cms`.
-It is based on the latest npm package definitions from `talizen`.
+This document describes how to use the CMS APIs exported by `talizen/cms`.
+It intentionally does not duplicate the package's TypeScript declarations,
+because those declarations can change when the npm package is updated.
 
 Use your project's `/types/cms.d.ts` as the schema source of truth, and use
 `talizen/cms` for the platform-level fetch helpers.
@@ -51,89 +52,38 @@ export interface Blogs {
 }
 ```
 
-## talizen/cms package definition
+## talizen/cms package definitions
 
-`talizen` currently exports the following CMS types:
+This document keeps common CMS helper names and examples for quick use. For the
+stable helpers listed below, do not fetch package declarations for every simple
+use.
+
+Fetch current package declarations only when you need an exact type/signature,
+use an undocumented helper, see a package version change, or hit lint/typecheck
+errors:
 
 ```ts
-import { type TalizenRequestOptions } from "talizen/core"
-
-export interface BaseCmsItem {
-  readonly __cmsKey: string
-  slug: string
-  id: string
-  body: Record<string, unknown>
-}
-
-export interface GetContentListFilterCondition {
-  fieldId?: string
-  operator?: string
-  value?: any
-}
-
-export interface GetContentListFilter {
-  match?: "any" | "all"
-  conditions?: GetContentListFilterCondition[]
-}
-
-export interface ListContentParams {
-  limit?: number
-  offset?: number
-  searchKey?: string
-  orderBy?: string
-  filter?: GetContentListFilter
-}
-
-export interface GetContentParams {
-}
-
-export interface GetContentWithPrevNextParams extends GetContentParams {
-  prev?: boolean
-  next?: boolean
-  searchKey?: string
-  orderBy?: string
-  filter?: GetContentListFilter
-}
-
-export interface ListResponse<T> {
-  list?: T[]
-  total?: number
-}
-
-export interface ContentWithPrevNext<T extends BaseCmsItem> {
-  current?: T
-  next?: T
-  prev?: T
-}
-
-export declare function listContents<T extends BaseCmsItem>(
-  key: T["__cmsKey"],
-  params?: ListContentParams,
-  options?: TalizenRequestOptions,
-): Promise<ListResponse<T>>
-
-export declare function getContent<T extends BaseCmsItem>(
-  key: T["__cmsKey"],
-  slug: string,
-  params?: GetContentParams,
-  options?: TalizenRequestOptions,
-): Promise<T>
-
-export declare function getContentWithPrevNext<T extends BaseCmsItem>(
-  key: T["__cmsKey"],
-  slug: string,
-  params?: GetContentWithPrevNextParams,
-  options?: TalizenRequestOptions,
-): Promise<ContentWithPrevNext<T>>
+fetch_module_types("talizen/cms")
 ```
 
-Important:
-- The current package uses `listContents`, `getContent`, and
-  `getContentWithPrevNext`.
-- Older names like `ListContent` and `GetContent` should be treated as outdated
-  documentation unless the project provides its own wrapper.
-- All three APIs support an optional third or fourth `options` argument from
-  `talizen/core`.
+Rules:
+
+1. Use the examples below as a quick reference for common flows.
+2. Treat fetched declarations as the source of truth for exact parameter types,
+   return types, generics, and optional arguments.
+3. If a helper name, argument, or return type differs from an example, follow
+   the fetched package declarations.
+4. Use `get_import_map()` when you need to know which `talizen` package version
+   or CDN URL is currently effective.
+
+The generated `/types/cms.d.ts` file describes project content shapes. The
+fetched `talizen/cms` declarations describe SDK helpers. Use both together.
+
+Common helpers in current examples:
+
+- `listContents` for paginated content lists.
+- `getContent` for one item by slug.
+- `getContentWithPrevNext` for detail pages that need adjacent items.
 
 ## List content
 
@@ -173,9 +123,9 @@ export default function Page({ content }) {
 ```
 
 Notes:
-- `listContents` returns `{ list?: T[]; total?: number }`.
-- `searchKey`, `orderBy`, and `filter` are supported in addition
-  to `limit` and `offset`.
+- The common return shape is `{ list?: T[]; total?: number }`.
+- Common optional params include `limit`, `offset`, `searchKey`, `orderBy`, and
+  `filter`. Fetch declarations only if you need exact parameter details.
 
 ### Order by
 `orderBy` supported: `created_at`, `created_at desc`, `updated_at`, `updated_at desc`, `sort`, `sort desc`
@@ -184,7 +134,8 @@ default order by: `created_at desc`
 
 ## Filter content
 
-Use `filter` when you need structured server-side filtering.
+Use `filter` when you need structured server-side filtering. Check the current
+declarations if you need the exact supported filter shape or operators.
 
 ```ts
 const content = await listContents<Blogs>("blogs", {
@@ -219,8 +170,8 @@ export async function getServerSideProps(context) {
 ```
 
 Notes:
-- The second argument is the item `slug`.
-- `getContent` returns a single typed item, not a `{ list, total }` wrapper.
+- The common argument order is collection key, slug, optional params, optional
+  request options. Fetch declarations only if you need exact details.
 
 ## Get current item with prev/next
 
@@ -237,7 +188,7 @@ const article = await getContentWithPrevNext<Blogs>("blogs", slug, {
 })
 ```
 
-Return shape:
+Common return shape:
 
 ```ts
 {
