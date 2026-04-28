@@ -201,6 +201,10 @@ If you see `TypeError: Cannot read properties of null (reading 'useState')` with
 
 For slideshow or carousel requirements, follow `references/CAROUSEL.md` as the primary guide for recommended package setup and usage patterns.
 
+## Visual Effects
+
+When the user asks for polished animations, flashy interactions, creative backgrounds, particles, cursor effects, text animations, hover effects, or similar visual effects, prefer searching the `@react-bits` registry before implementing custom effects. Use `shadcn_search_items` for targeted queries such as `background`, `particles`, `cursor`, `text animation`, or `hover`, and use `shadcn_list_items` for broader discovery. Integrate selected components using Talizen's existing React, Tailwind v4, and `importMap` conventions, and make sure animated layers do not block content, reduce readability, or break responsive layouts.
+
 ## Styling Rules (Tailwind v4)
 
 Talizen uses Tailwind CSS v4 built-in. Follow these rules:
