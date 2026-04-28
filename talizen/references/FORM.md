@@ -6,7 +6,20 @@ title: Talizen Form Usage
 
 This document explains how to use the `talizen/form` npm package to submit forms,
 and how to create complex forms in the Talizen system.
-It is based on the latest npm package definitions from `talizen`.
+It keeps common form submission examples for quick use, but these examples are
+not a replacement for package declarations. Do not fetch package declarations
+for every simple submission. Call `fetch_module_types("talizen/form")` only when
+you need exact parameter or return types, use an undocumented helper, see a
+package version change, or hit lint/typecheck errors.
+
+There are two complementary type sources:
+
+- `talizen/form` provides SDK helpers such as `submitForm`.
+- `/types/form.d.ts` provides the user's generated form payload types and field
+  shapes.
+
+Use `submitForm` from `talizen/form`, and type the payload with the generated
+type from `/types/form.d.ts`.
 
 ## Build a Form
 
@@ -51,11 +64,10 @@ Minimal mapping (these are the only ones AI needs to remember):
 ## Submit a Form
 
 - Use `submitForm` from the npm package `talizen/form` to submit forms.
-  - The first argument accepts either a form key or a token string.
 - Call `submitForm` from client-side event handlers such as `onSubmit` or
   `onClick`.
-- Prefer generated types from `/types/form.d.ts`. (This file is
-  system-generated and cannot be edited.)
+- Type the submitted payload with generated types from `/types/form.d.ts`.
+  This file is system-generated and cannot be edited.
 - Show explicit success and error UI states after submission.
 - If a field is typed as **File** in `/types/form.d.ts`, pass a raw `File` or
   `Blob` to `submitForm`. (The function uploads file values automatically.)

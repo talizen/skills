@@ -16,6 +16,39 @@ This skill explains how to work inside the Talizen site builder from code: how t
 
 Talizen apps are built with React components and a root configuration file `talizen.config.ts`. SEO is configured in two layers: global site-level metadata in `talizen.config.ts` and page-level metadata exported from each page component file.
 
+## Package Types
+
+Packages in Talizen projects are resolved through the effective import map and
+often come from CDN URLs. `fetch_module_types(specifier)` is the general tool
+for fetching TypeScript declarations for any package or subpath, not only
+`talizen` packages. Do not call it for every simple import.
+
+Use `fetch_module_types(specifier)` only when one of these is true:
+
+1. The code needs an exact parameter type, return type, generic constraint, or
+   optional argument that is not documented in the quick reference.
+2. You are using a less common package, subpath, or helper that is not covered by
+   local quick references or obvious existing usage.
+3. `get_import_map()` shows the effective package URL/version changed, or the
+   user explicitly asks to verify the current package API.
+4. Lint/typecheck fails or existing code suggests the documented quick reference
+   may be stale.
+
+When you do fetch declarations, reuse the result for the same specifier and
+effective import-map URL during the current task. Fetched declarations override
+stale examples or historical signatures.
+
+Keep package declarations separate from generated project types:
+
+- `fetch_module_types("specifier")` describes npm/CDN package exports and helper
+  signatures, for example `talizen/cms`, `talizen/form`, `framer-motion`, or
+  `lucide-react`.
+- `/types/cms.d.ts` and `/types/form.d.ts` describe the user's generated project
+  schemas and payloads, such as CMS collection item shapes and form payload
+  fields.
+- These sources are complementary, not alternatives. Use SDK declarations for
+  helper signatures and generated project types for content/payload data shapes.
+
 ## Runtime & Routing Rules
 
 Talizen uses its own runtime for rendering; it is not a standard browser frontend or Next.js runtime. You must follow these structural rules or the program will break:
@@ -64,9 +97,9 @@ you should:
 2. For third-party libraries, use `get_import_map()` when you need to inspect the final effective import map, and update `talizen.config.ts` only when adding or changing user-defined extra imports.
 3. For SEO, prefer using the `metadata` field in `talizen.config.ts` plus per-page `export const metadata` or `export async function generateMetadata(...)` instead of ad-hoc `seo` fields or raw `<meta>` tags.
 4. For page-specific SEO, open the page component (for example `Page.tsx`/`PAGE.tsx`) and add or edit its exported `metadata` or `generateMetadata`.
-5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props. When content does not exist, return `notFound: true`; when access or routing should change, return a `redirect`.
-6. For form submission, use `talizen/form` and read `/types/form.d.ts` before wiring payload fields.
-7. Keep styling in Tailwind v4 utility classes; do not introduce inline styles. For site-wide Tailwind v4 directives (`@theme`, `@utility`, `@layer`, etc.), use the platform-supported site file `/index.css` (see `references/INDEX_CSS.md`); do not add arbitrary extra CSS files outside that convention.
+5. For CMS data, use `talizen/cms` in `getServerSideProps` to fetch content and pass it into the page as props. Use the CMS quick reference first; fetch module types only when exact signatures are needed or something fails validation. When content does not exist, return `notFound: true`; when access or routing should change, return a `redirect`.
+6. For form submission, use `submitForm` from `talizen/form` and type the submitted payload from `/types/form.d.ts`. The generated form types define payload shape; `fetch_module_types("talizen/form")` is only for confirming the SDK helper signature when needed.
+7. Keep styling in Tailwind v4 utility classes; do not introduce inline styles. For site-wide Tailwind v4 directives (`@theme`, `@utility`, `@layer`, etc.), use the platform-supported site file `/index.css` (see `references/CSS.md`); do not add arbitrary extra CSS files outside that convention.
 
 ## CMS Usage
 
@@ -74,7 +107,7 @@ Talizen provides a CMS client via the `talizen/cms` package. Use it inside `getS
 
 High-level rules:
 
-- Use `listContents` for lists (for example blog indexes) and `getContent` for single items (for example blog detail pages).
+- Use the stable CMS helpers `listContents` for lists, `getContent` for single items, and `getContentWithPrevNext` for adjacent content. Do not fetch module types for these simple cases unless you need exact parameter or return types.
 - Always treat CMS data as optional; use optional chaining (`?.`) and provide user-friendly fallbacks.
 - Keep CMS access in `getServerSideProps` and pass plain serializable props to the page component.
 
@@ -88,7 +121,8 @@ Talizen provides a Form client via the `talizen/form` package. Use it when a pag
 
 High-level rules:
 
-- Read `/types/form.d.ts` before writing form code so you know the exact `key` and payload shape.
+- Use the stable form helper `submitForm` for submissions. Do not fetch module types for simple submissions unless you need exact parameter or return types.
+- Read `/types/form.d.ts` before writing form code so you know the exact generated payload type and field shape.
 - Import the payload type from `./types/form` and keep the submitted data aligned with that type.
 - Use the stable form `key` from the editor, not the display name.
 - In Talizen AI tools, use `list_form()` to inspect forms and `create_form({...})` to create new forms.
