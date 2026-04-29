@@ -245,7 +245,37 @@ For slideshow or carousel requirements, follow `references/CAROUSEL.md` as the p
 
 ## Visual Effects
 
-When the user asks for polished animations, flashy interactions, creative backgrounds, particles, cursor effects, text animations, hover effects, or similar visual effects, prefer searching the `@react-bits` registry before implementing custom effects. Use `shadcn_search_items` for targeted queries such as `background`, `particles`, `cursor`, `text animation`, or `hover`, and use `shadcn_list_items` for broader discovery. Integrate selected components using Talizen's existing React, Tailwind v4, and `importMap` conventions, and make sure animated layers do not block content, reduce readability, or break responsive layouts.
+When the user asks for polished animations, flashy interactions, creative backgrounds, particles, cursor effects, text animations, hover effects, or similar visual effects, prefer searching component registries before implementing custom effects.
+
+## Shadcn-Compatible Components
+
+For shadcn/ui-style registry components, configure project registries first, then search and install through the shadcn tools.
+
+1. Create or update `components.json` at the project root.
+2. Add the needed `registries` entries:
+
+```json
+{
+  "registries": {
+    "@spell": "https://spell.sh/r/{name}.json",
+    "@fancy": "https://fancycomponents.dev/r/{name}.json",
+    "@react-bits": "https://reactbits.dev/r/{name}.json"
+  }
+}
+```
+
+3. Use `shadcn_search_items` for targeted queries such as `background`, `particles`, `cursor`, `text animation`, `hover`, `button`, or `card`.
+4. Use `shadcn_list_items` for broader discovery within a registry.
+5. Use `shadcn_install_item` to install the selected component.
+6. After installation, integrate the component using Talizen's React, Tailwind v4, and `importMap` conventions.
+
+Common registries:
+
+- `@spell`: `https://spell.sh/r/{name}.json`
+- `@fancy`: `https://fancycomponents.dev/r/{name}.json`
+- `@react-bits`: `https://reactbits.dev/r/{name}.json`
+
+For visual effects specifically, prefer searching `@react-bits` first. Make sure installed animated layers do not block content, reduce readability, or break responsive layouts.
 
 ## Styling Rules (Tailwind v4)
 
