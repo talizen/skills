@@ -20,8 +20,7 @@ Talizen apps are built with React components and a root configuration file `tali
 
 Packages in Talizen projects are resolved through the effective import map and
 often come from CDN URLs. `fetch_module_types(specifier)` is the general tool
-for fetching TypeScript declarations for any package or subpath, not only
-`talizen` packages. Do not call it for every simple import.
+for fetching TypeScript declarations for any package or subpath.
 
 Use `fetch_module_types(specifier)` only when one of these is true:
 
@@ -34,15 +33,12 @@ Use `fetch_module_types(specifier)` only when one of these is true:
 4. Lint/typecheck fails or existing code suggests the documented quick reference
    may be stale.
 
-When you do fetch declarations, reuse the result for the same specifier and
-effective import-map URL during the current task. Fetched declarations override
-stale examples or historical signatures.
+Do not use `fetch_module_types(specifier)` for widely used packages that are already well covered by model knowledge (for example, `react`, `react-router-dom`).
 
 Keep package declarations separate from generated project types:
 
 - `fetch_module_types("specifier")` describes npm/CDN package exports and helper
-  signatures, for example `talizen/cms`, `talizen/form`, `framer-motion`, or
-  `lucide-react`.
+  signatures, for example `talizen/cms`, `talizen/form`.
 - `/types/cms.d.ts` and `/types/form.d.ts` describe the user's generated project
   schemas and payloads, such as CMS collection item shapes and form payload
   fields.
@@ -179,6 +175,19 @@ Key points:
 - `customCode.head` / `customCode.body` are literal HTML strings injected into the document; keep them small and focused (analytics, verification tags, etc.).
 - Use `metadata` for SEO instead of ad-hoc `seo` fields.
 
+### When to Use Custom Head/Body Code
+
+Use `customCode.head` / `customCode.body` for:
+
+- Analytics snippets
+- Third-party verification tags
+- Custom scripts that are not covered by `metadata`
+
+Avoid duplicating metadata:
+
+- Do not emit `<title>` or `<meta name="description">` manually when they are already covered by `metadata`.
+- Prefer structured `metadata` for anything that fits into the Next.js metadata schema; treat `<meta>` tags in `customCode` as a last resort.
+
 ## SEO & Metadata Overview
 
 Talizen follows a two-level metadata model similar to Next.js:
@@ -237,15 +246,13 @@ Keep importMap clean:
 - Do not add `react` or `react-dom` or `talizen` to `importMap.imports`; Talizen already provides them and redefining them can cause runtime issues. For React-dependent packages from esm.sh, use `?external=react` on the URL (for example `'https://esm.sh/framer-motion@12.34.5?external=react'`) so the module uses the host React instead of bundling another copy.
 - Update URLs carefully when bumping versions.
 
+### Troubleshooting
+
 If you see `TypeError: Cannot read properties of null (reading 'useState')` with a stack that mentions both `react.mjs` and a third-party module from esm.sh, that is usually duplicate React: add `?external=react` to that package’s import URL (subpaths that ship React wrappers often need it), for example `'swiper/react': 'https://esm.sh/swiper@11/react?external=react'`.
 
 ## Carousel & Slideshow
 
 For slideshow or carousel requirements, follow `references/CAROUSEL.md` as the primary guide for recommended package setup and usage patterns.
-
-## Visual Effects
-
-When the user asks for polished animations, flashy interactions, creative backgrounds, particles, cursor effects, text animations, hover effects, or similar visual effects, prefer searching component registries before implementing custom effects.
 
 ## Shadcn-Compatible Components
 
@@ -277,31 +284,22 @@ Common registries:
 
 For visual effects specifically, prefer searching `@react-bits` first. Make sure installed animated layers do not block content, reduce readability, or break responsive layouts.
 
+### Visual Effects
+
+When the user asks for polished animations, flashy interactions, creative backgrounds, particles, cursor effects, text animations, hover effects, or similar visual effects, prefer searching component registries before implementing custom effects.
+
 ## Styling Rules (Tailwind v4)
 
 Talizen uses Tailwind CSS v4 built-in. Follow these rules:
 
 - Use Tailwind utility classes for styling.
 - Do not use inline styles (`style` props) or ad-hoc `<style>` tags in page components.
-- **Site-level CSS:** The preview loads an optional site root file **`/index.css`** (and optionally `tailwindCss` from `talizen.config.ts`) into the iframe as Tailwind source (`type="text/tailwindcss"`). Use this for theme tokens, shared utilities, and base layers—not for one-off component styling. See **`references/INDEX_CSS.md`** for conventions, merge order, and examples.
+- **Site-level CSS:** The preview loads an optional site root file **`/index.css`** (and optionally `tailwindCss` from `talizen.config.ts`) into the iframe as Tailwind source (`type="text/tailwindcss"`). Use this for theme tokens, shared utilities, and base layers—not for one-off component styling. See **`references/CSS.md`** for conventions, merge order, and examples.
 - When adding transitions on color, ensure the color is driven from a single source to avoid “double transitions”:
   - Bad: parent changes text color on hover and child also has its own hover color, causing a jarring effect.
   - Good: either keep the child color fixed and let it inherit the parent change, or control the child color only via a single hover/group-hover rule.
 
 Express color transitions through a consistent set of Tailwind classes on the same element or the same group.
-
-## When to Use Custom Head/Body Code
-
-Use `customCode.head` / `customCode.body` for:
-
-- Analytics snippets
-- Third-party verification tags
-- Custom scripts that are not covered by `metadata`
-
-Avoid duplicating metadata:
-
-- Do not emit `<title>` or `<meta name="description">` manually when they are already covered by `metadata`.
-- Prefer structured `metadata` for anything that fits into the Next.js metadata schema; treat `<meta>` tags in `customCode` as a last resort.
 
 ## Task Planning & Tools (Talizen AI Assistant)
 
