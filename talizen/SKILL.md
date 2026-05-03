@@ -113,6 +113,20 @@ lists, and absolute URLs for Open Graph media.
 
 For complete fields and migration examples, see `references/SEO.md`.
 
+## Sitemap
+
+Use a root-level `/sitemap.ts` file for sitemap generation. Its authoring rules
+follow Next.js `sitemap.ts`: export a default function that returns sitemap
+entries or a promise of sitemap entries.
+
+- Keep `/sitemap.ts` at the project root, not under `/app`.
+- Use `TALIZEN_PUBLIC_SITE_URL` environment variable for the site URL.
+- Use `listContents` from `talizen/cms` when entries depend on CMS list or detail
+  page data.
+- Read `/types/cms.d.ts` before referencing collection fields.
+
+For complete rules and a minimal example, see `references/SITEMAP.md`.
+
 ## Import Map
 
 There are two import map views:
@@ -132,7 +146,7 @@ Keep import maps clean:
   React copy, for example
   `https://esm.sh/framer-motion@12.34.5?external=react`.
 - If you see duplicate-React symptoms such as `Cannot read properties of null
-  (reading 'useState')` with both `react.mjs` and an esm.sh package in the stack,
+(reading 'useState')` with both `react.mjs` and an esm.sh package in the stack,
   add `?external=react` to that package URL, including React wrapper subpaths
   such as `swiper/react`.
 
