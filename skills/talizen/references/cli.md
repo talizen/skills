@@ -8,6 +8,7 @@ It supports:
 - Logging in to Talizen from the terminal.
 - Listing projects and sites.
 - Pulling remote site files into a local directory.
+- Pushing the current local site file snapshot back to Talizen.
 - Watching local site files and syncing changes back to Talizen.
 - Opening or creating a platform preview.
 - Publishing the current site state or a specific commit.
@@ -16,54 +17,62 @@ It supports:
 The CLI does not render sites locally. Rendering, CMS, assets, and realtime
 preview are handled by the Talizen backend and web app.
 
-## Repositories And Endpoints
+## Install
 
-CLI repository:
+Install the CLI from npm:
 
-```text
-/Users/bysir/dev/bysir/talizen-cli
+```bash
+npm install -g talizen-cli
 ```
 
-Backend repository:
+The package installs the `talizen` command. It requires Node.js 18 or newer and
+supports macOS, Linux, and Windows on x64 or arm64.
 
-```text
-/Users/bysir/dev/bysir/folia
+Verify the install before using the CLI:
+
+```bash
+talizen version
 ```
 
-Local development endpoints:
+## Endpoints
 
-```text
-API: http://localhost:8433
-Web: http://localhost:5173
-```
-
-Production defaults:
+The CLI uses the Talizen production endpoint by default:
 
 ```text
 API: https://talizen.com
 Web: https://talizen.com
 ```
 
-## Common Local Commands
+Omit `--api` and `--web` unless the user explicitly provides a different
+Talizen endpoint for their environment.
+
+## Common Commands
 
 ```bash
-talizen login --api=http://localhost:8433 --web=http://localhost:5173
-talizen projects --api=http://localhost:8433
-talizen pull --api=http://localhost:8433 --site_id=<project_id>/<site_id> --dir=./mysite
-talizen sync --api=http://localhost:8433 --site_id=<project_id>/<site_id> --dir=./mysite
-talizen preview --api=http://localhost:8433 --site_id=<project_id>/<site_id>
+talizen login
+talizen projects
+talizen pull --site_id=<project_id>/<site_id> --dir=./mysite
+talizen push --site_id=<project_id>/<site_id> --dir=./mysite
+talizen sync --site_id=<project_id>/<site_id> --dir=./mysite
+talizen preview --site_id=<project_id>/<site_id>
 talizen publish
 talizen publish --commit=<commit>
 ```
-
-Use production defaults by omitting `--api` and `--web` when the user is working
-against production.
 
 ## Working With Site Files
 
 If the site is not already local, use `talizen projects` to find the project and
 site ID, then `talizen pull` into a target directory. Edit files locally, then
-use `talizen sync` to push local changes back to Talizen.
+use `talizen push` to upload the current local snapshot back to Talizen.
+
+Use `talizen sync` when you want watch mode. `sync` first pushes the current
+local snapshot, then keeps running and automatically listens for later local
+file changes.
+
+Both `push` and `sync` are one-way local-to-remote workflows. They do not pull
+Web editor changes back to the local directory. If the same site was edited in
+the Web editor, run `talizen pull` manually or restart from a clean local copy
+before continuing.
 
 When verification depends on platform rendering, use `talizen preview` instead
 of starting a local renderer. A Talizen site is not expected to render locally by
@@ -132,8 +141,3 @@ By default the command prints the public file URL. With `--json`, it prints the
 full upload metadata, including `site_path`, a stable `/_assets/...` path that
 can be referenced from Talizen site code. Prefer `site_path` in site code when a
 stable project-relative asset path is better than a CDN URL.
-
-## Release Note
-
-Do not run local GoReleaser validation before release. Releases are validated
-and built by the GitHub Actions release workflow when the release tag is pushed.
