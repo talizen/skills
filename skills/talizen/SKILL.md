@@ -2,16 +2,17 @@
 name: talizen
 description: >
   Use when working with Talizen sites or the Talizen CLI, including pulling site
-  code locally, syncing changes, writing Talizen-compatible React page/component
-  code, CMS and form integration, routing, styling, metadata, previewing,
-  publishing, or debugging local-to-platform workflows.
+  code locally, pushing local changes, running watch-mode sync, writing
+  Talizen-compatible React page/component code, CMS and form integration,
+  routing, styling, metadata, previewing, publishing, or debugging
+  local-to-platform workflows.
 ---
 
 # Talizen
 
 Talizen sites are React-based websites rendered by the Talizen platform. Local
 agents usually work by using the Talizen CLI to pull site files, editing those
-files locally, then syncing or previewing through Talizen.
+files locally, then pushing, syncing, or previewing through Talizen.
 
 This skill is for general-purpose agents. Do not assume Talizen-system-only
 tools are available. If the current environment exposes Talizen tools such as
@@ -20,8 +21,12 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 
 ## Core Model
 
-- The CLI handles login, project/site discovery, pull, sync, preview, and
+- The CLI handles login, project/site discovery, pull, push, sync, preview, and
   publish workflows, plus platform data and asset operations.
+- `pull` downloads remote site files into a local directory.
+- `push` uploads the current local directory snapshot to Talizen and exits.
+- `sync` is watch mode: it pushes the current local snapshot, then keeps
+  listening for local file changes and pushes them in realtime.
 - The CLI does not render sites locally.
 - Rendering, CMS, assets, realtime preview, and publication are handled by the
   Talizen backend and web app.
@@ -38,8 +43,9 @@ use them when appropriate; otherwise inspect local files and use the CLI.
    before editing.
 5. Apply focused changes that match existing project conventions.
 6. Validate with available local checks or Talizen platform checks. If no local
-   renderer exists, use `talizen sync` or `talizen preview` as the verification
-   path.
+   renderer exists, use `talizen push`, `talizen sync`, or `talizen preview` as
+   the verification path. Use `talizen push` for a one-time upload and
+   `talizen sync` when you want watch mode.
 
 ## Hard Platform Rules
 
@@ -60,8 +66,8 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 
 ## Reference Map
 
-- `references/cli.md`: CLI install/use, local and production endpoints, release
-  note, platform data commands, and asset upload commands.
+- `references/cli.md`: CLI install/use, endpoint defaults, platform data
+  commands, and asset upload commands.
 - `references/site-code.md`: routing, page/component structure, import maps,
   and config rules.
 - `references/cms.md`: CMS data fetching and generated schema usage.
