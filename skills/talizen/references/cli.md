@@ -1,143 +1,100 @@
 # Talizen CLI
 
-The Talizen CLI is a Go command-line tool that acts as a local bridge for
-Talizen site code.
+The Talizen CLI is a local bridge for Talizen site code. It handles auth,
+project/site discovery, file pull/push/sync, remote preview, publishing,
+platform data operations, and asset uploads.
 
-It supports:
+The CLI does not render sites locally. Rendering, CMS, assets, realtime preview,
+and publication are handled by the Talizen backend and web app.
 
-- Logging in to Talizen from the terminal.
-- Listing projects and sites.
-- Pulling remote site files into a local directory.
-- Pushing the current local site file snapshot back to Talizen.
-- Watching local site files and syncing changes back to Talizen.
-- Opening or creating a platform preview.
-- Publishing the current site state or a specific commit.
-- Uploading local files through the Talizen site asset flow.
+## Basics
 
-The CLI does not render sites locally. Rendering, CMS, assets, and realtime
-preview are handled by the Talizen backend and web app.
-
-## Install
-
-Install the CLI from npm:
+Install and verify:
 
 ```bash
 npm install -g talizen-cli
-```
-
-The package installs the `talizen` command. It requires Node.js 18 or newer and
-supports macOS, Linux, and Windows on x64 or arm64.
-
-Verify the install before using the CLI:
-
-```bash
 talizen version
 ```
 
-## Endpoints
-
-The CLI uses the Talizen production endpoint by default:
+Use the production endpoint by default. Omit `--api` and `--web` unless the user
+explicitly provides another Talizen environment.
 
 ```text
 API: https://talizen.com
 Web: https://talizen.com
 ```
 
-Omit `--api` and `--web` unless the user explicitly provides a different
-Talizen endpoint for their environment.
+Use `talizen <command> --help` for exact flags. Prefer this over memorizing
+rare subcommands because the CLI surface can change.
 
-## Common Commands
+## Core Workflow
 
 ```bash
 talizen login
+talizen logout
 talizen projects
 talizen pull --site_id=<project_id>/<site_id> --dir=./mysite
 talizen push --site_id=<project_id>/<site_id> --dir=./mysite
 talizen sync --site_id=<project_id>/<site_id> --dir=./mysite
 talizen preview --site_id=<project_id>/<site_id>
-talizen publish
-talizen publish --commit=<commit>
+talizen publish --site_id=<project_id>/<site_id>
 ```
 
-## Working With Site Files
+`pull` downloads remote site files. `push` uploads the current local directory
+snapshot and exits. `sync` first pushes the current snapshot, then watches local
+file changes and keeps uploading them.
 
-If the site is not already local, use `talizen projects` to find the project and
-site ID, then `talizen pull` into a target directory. Edit files locally, then
-use `talizen push` to upload the current local snapshot back to Talizen.
+`push` and `sync` are one-way local-to-remote flows. They do not pull Web editor
+changes back into the local directory. If the site may have been edited in the
+Web editor, run `pull` manually or restart from a clean local copy before
+continuing.
 
-Use `talizen sync` when you want watch mode. `sync` first pushes the current
-local snapshot, then keeps running and automatically listens for later local
-file changes.
+Use `preview` when verification depends on platform rendering. Do not start a
+generic local renderer unless the project explicitly provides one.
 
-Both `push` and `sync` are one-way local-to-remote workflows. They do not pull
-Web editor changes back to the local directory. If the same site was edited in
-the Web editor, run `talizen pull` manually or restart from a clean local copy
-before continuing.
+## Publishing
 
-When verification depends on platform rendering, use `talizen preview` instead
-of starting a local renderer. A Talizen site is not expected to render locally by
-default.
+Changing project files does not publish them to the live site by default. Use
+`publish` to promote the latest remote site code to the live version after
+pushing or syncing changes.
 
-## Platform Data Commands
+Publishing requires a site ID:
 
-General-purpose agents should use CLI commands for platform data operations such
-as CMS collections, CMS content, forms, and generated types. Do not assume
-Talizen-system-only tools such as `create_collection`, `create_form`, or direct
-internal patch helpers exist outside the Talizen system agent.
+```bash
+talizen publish --site_id=<project_id>/<site_id>
+talizen publish --site_id=<project_id>/<site_id> --note=<note>
+```
 
-CMS collections:
+Run `talizen publish --help` if you need to confirm current publish flags.
+
+## Platform Data
+
+For CMS, content, forms, and generated types, prefer CLI commands in
+general-purpose agent environments. Do not assume Talizen-system-only tools such
+as `create_collection`, `create_form`, or internal patch helpers exist.
+
+Common entry points:
 
 ```bash
 talizen cms collections --site_id=<project_id>/<site_id>
-talizen cms collection get --site_id=<project_id>/<site_id> (--id=<id> | --key=<key>)
-talizen cms collection create --site_id=<project_id>/<site_id> --key=<key> --name=<name> --schema=./schema.json
-talizen cms collection update --site_id=<project_id>/<site_id> (--id=<id> | --key=<key>) [--new-key=<key>] [--name=<name>] [--desc=<desc>] [--schema=./schema.json]
-talizen cms collection delete --site_id=<project_id>/<site_id> (--id=<id> | --key=<key>)
-```
-
-CMS content:
-
-```bash
-talizen content list --site_id=<project_id>/<site_id> --collection=<key> [--limit=20] [--offset=0] [--filter=./filter.json]
-talizen content get --site_id=<project_id>/<site_id> --collection=<key> (--id=<id> | --slug=<slug>)
-talizen content create --site_id=<project_id>/<site_id> --collection=<key> --data=./content.json [--slug=<slug>] [--sort=0]
-talizen content update --site_id=<project_id>/<site_id> --collection=<key> --id=<id> --data=./content.json [--slug=<slug>] [--publish=true]
-talizen content delete --site_id=<project_id>/<site_id> --collection=<key> --id=<id>
-```
-
-Forms:
-
-```bash
+talizen content list --site_id=<project_id>/<site_id> --collection=<key>
 talizen form list --site_id=<project_id>/<site_id>
-talizen form get --site_id=<project_id>/<site_id> (--id=<id> | --key=<key>)
-talizen form create --site_id=<project_id>/<site_id> --key=<key> --name=<name> --schema=./schema.json
-talizen form update --site_id=<project_id>/<site_id> (--id=<id> | --key=<key>) [--new-key=<key>] [--name=<name>] [--desc=<desc>] [--schema=./schema.json] [--setting=./setting.json]
-talizen form delete --site_id=<project_id>/<site_id> (--id=<id> | --key=<key>)
-talizen form logs --site_id=<project_id>/<site_id> (--id=<id> | --key=<key>) [--limit=20] [--offset=0]
-talizen form log get --site_id=<project_id>/<site_id> (--id=<form_id> | --key=<form_key>) --log_id=<log_id>
-talizen form log delete --site_id=<project_id>/<site_id> (--id=<form_id> | --key=<form_key>) --log_id=<log_id>
-talizen form submit --site_id=<project_id>/<site_id> --key=<form_key> --data=./payload.json
 ```
 
-Prefer file-based JSON input for schemas and content payloads. It is easier for
-agents to inspect, validate, edit, and retry than deeply escaped JSON passed
-inline on the command line.
-
-After creating or changing collections/forms, pull or refresh generated files
-such as `/types/cms.d.ts` and `/types/form.d.ts` before writing code that imports
-those types.
+Use file-based JSON input for schemas, content, and form payloads when a command
+accepts it. After creating or changing collections/forms, pull or refresh
+generated files such as `/types/cms.d.ts` and `/types/form.d.ts` before writing
+code that imports those types.
 
 ## Asset Upload
 
-Use `talizen upload` when site code needs a local file to become a Talizen-hosted
-asset.
+Use `talizen upload` when site code needs a local file to become a
+Talizen-hosted asset.
 
 ```bash
 talizen upload --site_id=<project_id>/<site_id> --file=./image.png
-talizen upload --site_id=<project_id>/<site_id> --file=./image.png --name=hero.png --json
+talizen upload --site_id=<project_id>/<site_id> --file=./image.png --json
 ```
 
-By default the command prints the public file URL. With `--json`, it prints the
-full upload metadata, including `site_path`, a stable `/_assets/...` path that
-can be referenced from Talizen site code. Prefer `site_path` in site code when a
-stable project-relative asset path is better than a CDN URL.
+With `--json`, the command returns one key, `file_url`, containing the full CDN
+URL for the uploaded file.
