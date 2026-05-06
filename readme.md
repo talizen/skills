@@ -4,7 +4,7 @@ This repository provides Codex/agent skills for Talizen. They help agents unders
 
 ## What This Skill Does
 
-- Guides agents through Talizen CLI workflows for pulling, pushing, syncing, previewing, and publishing sites.
+- Guides agents through Talizen CLI workflows for creating projects, pulling, pushing, syncing, previewing, and publishing sites.
 - Enforces Talizen page development conventions, such as `/page` routes, the `/component` directory, native `<a>` navigation, and `getServerSideProps` for data loading.
 - Helps write React + Tailwind v4 pages and components that follow Talizen platform requirements.
 - Provides implementation references for common platform capabilities such as CMS, form submissions, SEO metadata, sitemaps, and carousel components.

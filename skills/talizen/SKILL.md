@@ -21,8 +21,8 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 
 ## Core Model
 
-- The CLI handles login, project/site discovery, pull, push, sync, preview, and
-  publish workflows, plus platform data and asset operations.
+- The CLI handles login, project creation and discovery, pull, push, sync,
+  preview, and publish workflows, plus platform data and asset operations.
 - `pull` downloads remote site files into a local directory.
 - `push` uploads the current local directory snapshot to Talizen and exits.
 - `sync` is watch mode: it pushes the current local snapshot, then keeps
