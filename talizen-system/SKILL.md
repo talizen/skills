@@ -142,6 +142,11 @@ Keep import maps clean:
 - Prefer `esm.sh` unless compatibility requires another CDN.
 - Do not add `react`, `react-dom`, or `talizen`; the platform already provides
   them.
+- Talizen's compiler supports Vite-style local asset queries for relative imports:
+  `import assetUrl from "./asset.ext?url"` returns a browser-accessible Blob URL,
+  and `import source from "./file.ext?raw"` returns the original file contents as
+  a string. Use these for worker source, WASM/worker helper scripts, and other
+  local assets that need URL or raw-string semantics.
 - For React-dependent esm.sh packages, use `?external=react` so they use the host
   React copy, for example
   `https://esm.sh/framer-motion@12.34.5?external=react`.
