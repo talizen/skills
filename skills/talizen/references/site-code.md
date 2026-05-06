@@ -38,11 +38,11 @@ Example:
 
 ```tsx
 export async function getServerSideProps(context) {
-  const slug = context.params?.slug
+  const slug = context.params?.slug;
 
   return {
     props: { slug },
-  }
+  };
 }
 ```
 
@@ -76,6 +76,11 @@ Rules:
 - For React-dependent esm.sh packages, use `?external=react` so they use the
   host React copy.
 - Keep the import specifier exactly the same as the `imports` key.
+- Talizen's compiler supports Vite-style local asset queries for relative imports:
+  `import assetUrl from "./asset.ext?url"` returns a browser-accessible Blob URL,
+  and `import source from "./file.ext?raw"` returns the original file contents as
+  a string. Use these for worker source, WASM/worker helper scripts, and other
+  local assets that need URL or raw-string semantics.
 
 Example:
 
@@ -86,7 +91,7 @@ export default {
       "framer-motion": "https://esm.sh/framer-motion@12.34.5?external=react",
     },
   },
-}
+};
 ```
 
 ## talizen.config.ts
