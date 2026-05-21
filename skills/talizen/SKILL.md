@@ -32,6 +32,11 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   Talizen backend and web app.
 - Site code must follow Talizen platform rules; do not treat a Talizen site as a
   generic Vite, Next.js, or browser SPA project.
+- The Talizen platform does not yet support authenticated backend data
+  operations, such as user login and registration. This capability is still
+  under development. If users need similar functionality, implement only the
+  frontend portion and clearly remind them that authenticated backend behavior is
+  not available yet.
 
 ## Default Workflow
 
@@ -63,6 +68,10 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   props and ad-hoc `<style>` tags in page components.
 - Use structured `metadata` for SEO instead of custom `seo` fields or raw
   `<title>` / `<meta name="description">` tags.
+- Do not implement authenticated backend data operations such as user login or
+  registration yet; the Talizen platform does not support them. If users need
+  similar functionality, implement only the frontend portion and clearly remind
+  them that authenticated backend behavior is not available yet.
 
 ## Reference Map
 

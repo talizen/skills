@@ -36,6 +36,10 @@ Use the `references/*.md` files for detailed examples.
   or ad-hoc `<style>` tags in page components.
 - Use `metadata` for SEO instead of custom `seo` fields or raw `<title>` /
   `<meta name="description">` tags.
+- Do not implement authenticated backend data operations such as user login or
+  registration yet; the Talizen platform does not support them. If users need
+  similar functionality, implement only the frontend portion and clearly remind
+  them that authenticated backend behavior is not available yet.
 
 ## Default Workflow
 
