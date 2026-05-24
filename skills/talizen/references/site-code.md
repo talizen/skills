@@ -56,6 +56,17 @@ If the user asks only for a component but also wants a preview, make the
 component visible in a page whenever possible. A standalone component cannot
 render as a site page by itself.
 
+## Local Imports
+
+Use relative paths for local project imports. The Talizen platform does not
+support alias imports such as `@/lib/utils`; write them as relative imports from
+the importing file, for example `../lib/utils`, `../../lib/utils`, or
+`./lib/utils`.
+
+Package imports and Talizen platform imports still use their normal specifiers,
+such as `react`, `talizen/cms`, and import-map keys configured in
+`talizen.config.ts`.
+
 ## Import Map
 
 There are two import map views:

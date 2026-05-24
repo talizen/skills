@@ -34,8 +34,14 @@ Use the `references/*.md` files for detailed examples.
   explicitly asks.
 - Use Tailwind v4 utility classes for styling. Do not add inline `style` props
   or ad-hoc `<style>` tags in page components.
+- Use relative paths for local project imports. The Talizen platform does not
+  support alias imports such as `@/lib/utils`; write them as relative imports
+  like `../lib/utils` or `./lib/utils` from the importing file.
 - Use `metadata` for SEO instead of custom `seo` fields or raw `<title>` /
   `<meta name="description">` tags.
+- If the user's message does not contain an actionable requirement, such as only
+  attaching an image without instructions, do not create or modify a website.
+  Ask the user what they want to build or change.
 - Do not implement authenticated backend data operations such as user login or
   registration yet; the Talizen platform does not support them. If users need
   similar functionality, implement only the frontend portion and clearly remind
