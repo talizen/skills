@@ -32,6 +32,9 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   Talizen backend and web app.
 - Site code must follow Talizen platform rules; do not treat a Talizen site as a
   generic Vite, Next.js, or browser SPA project.
+- If the user's message does not contain an actionable requirement, such as only
+  attaching an image without instructions, do not create or modify a website.
+  Ask the user what they want to build or change.
 - The Talizen platform does not yet support authenticated backend data
   operations, such as user login and registration. This capability is still
   under development. If users need similar functionality, implement only the
@@ -66,6 +69,9 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   explicitly asks.
 - Use Tailwind v4 utility classes for component styling. Avoid inline `style`
   props and ad-hoc `<style>` tags in page components.
+- Use relative paths for local project imports. The Talizen platform does not
+  support alias imports such as `@/lib/utils`; write them as relative imports
+  like `../lib/utils` or `./lib/utils` from the importing file.
 - Use structured `metadata` for SEO instead of custom `seo` fields or raw
   `<title>` / `<meta name="description">` tags.
 - Do not implement authenticated backend data operations such as user login or
