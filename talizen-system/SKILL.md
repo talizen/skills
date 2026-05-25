@@ -201,7 +201,8 @@ For shadcn/ui-style registry components:
 
 - Configure `components.json` registries first.
 - Use `shadcn_search_items`, `shadcn_list_items`, and `shadcn_install_item`.
-- Common registries are `@spell`, `@fancy`, and `@react-bits`.
+- Common registries are `@spell`, `@fancy`, `@react-bits`, and
+  `@talizen-sections`.
 - For polished visual effects, animations, particles, cursor effects, text
   animations, hover effects, or creative backgrounds, prefer searching component
   registries before implementing custom effects.
@@ -215,7 +216,8 @@ Minimal `components.json` example:
   "registries": {
     "@spell": "https://spell.sh/r/{name}.json",
     "@fancy": "https://fancycomponents.dev/r/{name}.json",
-    "@react-bits": "https://reactbits.dev/r/{name}.json"
+    "@react-bits": "https://reactbits.dev/r/{name}.json",
+    "@talizen-sections": "https://unpkg.com/@talizen/talizen-sections/public/r/{name}.json"
   }
 }
 ```
