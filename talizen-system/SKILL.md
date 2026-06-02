@@ -61,7 +61,7 @@ Use the `references/*.md` files for detailed examples.
 
 If the user asks only for a component, make it visible in a page whenever
 possible, especially when they ask to preview it. A standalone component cannot
-render as a site page by itself.
+render as a site page by itself. (If page does not exist, create it.)
 
 When importing an existing project into Talizen, preserve the full source
 experience: pages, content, behavior, and design fidelity unless the user asks
