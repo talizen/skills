@@ -48,6 +48,13 @@ Use the `references/*.md` files for detailed examples.
   Do not make speculative code changes before checking its retry limits and
   known non-fixable cases.
 
+## Error Trigger
+
+When tool output contains `LINT_ERROR`, `BROWSER_ERROR_RENDER`, a build failure,
+or a runtime failure, immediately activate the error-handling protocol by
+following `references/ERROR_HANDLING.md`. Do not perform speculative fixes
+before checking the relevant guidance.
+
 ## Default Workflow
 
 1. Locate the project root and read `talizen.config.ts` when configuration,
@@ -62,7 +69,7 @@ Use the `references/*.md` files for detailed examples.
 6. Run `lint` whenever page or component code changed.
 7. If lint, typecheck, build, preview, browser rendering, or runtime validation
    reports any error, follow `references/ERROR_HANDLING.md` immediately before
-   attempting fixes. Apply its retry limits and known non-fixable cases.
+   any fix action. Apply its retry limits and known non-fixable cases.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
 
