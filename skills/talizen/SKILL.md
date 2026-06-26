@@ -54,9 +54,9 @@ use them when appropriate; otherwise inspect local files and use the CLI.
    renderer exists, use `talizen push`, `talizen sync`, or `talizen preview` as
    the verification path. Use `talizen push` for a one-time upload and
    `talizen sync` when you want watch mode.
-7. If lint, typecheck, build, preview, or runtime validation keeps failing, read
-   `references/error-handling.md` and follow its retry limits before making more
-   code changes.
+7. If lint, typecheck, build, preview, browser rendering, or runtime validation
+   reports any error, read `references/error-handling.md` immediately before
+   attempting fixes. Follow its retry limits and known non-fixable cases.
 
 ## Hard Platform Rules
 
@@ -81,6 +81,10 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   registration yet; the Talizen platform does not support them. If users need
   similar functionality, implement only the frontend portion and clearly remind
   them that authenticated backend behavior is not available yet.
+- When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
+  error, the first response must be to read and follow
+  `references/error-handling.md`. Do not make speculative code changes before
+  checking that guidance.
 
 ## Reference Map
 
