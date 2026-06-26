@@ -43,6 +43,10 @@ Use the `references/*.md` files for detailed examples.
   registration yet; the Talizen platform does not support them. If users need
   similar functionality, implement only the frontend portion and clearly remind
   them that authenticated backend behavior is not available yet.
+- When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
+  error, the first response must be to follow `references/ERROR_HANDLING.md`.
+  Do not make speculative code changes before checking its retry limits and
+  known non-fixable cases.
 
 ## Default Workflow
 
@@ -56,8 +60,9 @@ Use the `references/*.md` files for detailed examples.
 5. Apply focused edits, preferably with `diff_patch_file` in the Talizen AI
    assistant.
 6. Run `lint` whenever page or component code changed.
-7. If lint, typecheck, build, preview, or runtime validation keeps failing,
-   follow `references/ERROR_HANDLING.md` before making more code changes.
+7. If lint, typecheck, build, preview, browser rendering, or runtime validation
+   reports any error, follow `references/ERROR_HANDLING.md` immediately before
+   attempting fixes. Apply its retry limits and known non-fixable cases.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
 
