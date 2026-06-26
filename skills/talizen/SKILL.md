@@ -55,8 +55,15 @@ use them when appropriate; otherwise inspect local files and use the CLI.
    the verification path. Use `talizen push` for a one-time upload and
    `talizen sync` when you want watch mode.
 7. If lint, typecheck, build, preview, browser rendering, or runtime validation
-   reports any error, read `references/error-handling.md` immediately before
-   attempting fixes. Follow its retry limits and known non-fixable cases.
+   reports any error, read `references/error-handling.md` immediately before any
+   fix action. Follow its retry limits and known non-fixable cases.
+
+## Error Trigger
+
+When tool output contains `LINT_ERROR`, `BROWSER_ERROR_RENDER`, a build failure,
+or a runtime failure, immediately activate the error-handling protocol by
+reading `references/error-handling.md`. Do not perform speculative fixes before
+checking the relevant guidance.
 
 ## Hard Platform Rules
 
