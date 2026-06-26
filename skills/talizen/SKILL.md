@@ -54,6 +54,9 @@ use them when appropriate; otherwise inspect local files and use the CLI.
    renderer exists, use `talizen push`, `talizen sync`, or `talizen preview` as
    the verification path. Use `talizen push` for a one-time upload and
    `talizen sync` when you want watch mode.
+7. If lint, typecheck, build, preview, or runtime validation keeps failing, read
+   `references/error-handling.md` and follow its retry limits before making more
+   code changes.
 
 ## Hard Platform Rules
 
@@ -91,6 +94,8 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 - `references/css.md`: Tailwind v4 and `index.css` conventions.
 - `references/sitemap.md`: root-level sitemap generation.
 - `references/carousel.md`: carousel/slideshow default approach.
+- `references/error-handling.md`: bounded handling for lint, typecheck, build,
+  preview, browser, runtime, and external-resource errors.
 
 For most site-authoring tasks, read `references/site-code.md` first, then load
 the specific topic reference only if the task touches that area.
