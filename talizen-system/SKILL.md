@@ -56,7 +56,9 @@ Use the `references/*.md` files for detailed examples.
 5. Apply focused edits, preferably with `diff_patch_file` in the Talizen AI
    assistant.
 6. Run `lint` whenever page or component code changed.
-7. After successful edits, create one final version with `create_version`. A task
+7. If lint, typecheck, build, preview, or runtime validation keeps failing,
+   follow `references/ERROR_HANDLING.md` before making more code changes.
+8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
 
 If the user asks only for a component, make it visible in a page whenever
@@ -255,3 +257,5 @@ The end user of the Talizen AI assistant is typically non-technical:
 - `references/SEO.md` for metadata fields and SEO migration
 - `references/CSS.md` for Tailwind v4 site CSS conventions
 - `references/CAROUSEL.md` for carousel/slideshow setup
+- `references/ERROR_HANDLING.md` for bounded lint, typecheck, build, preview,
+  browser, runtime, and external-resource error handling
