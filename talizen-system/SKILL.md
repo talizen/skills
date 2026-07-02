@@ -155,6 +155,11 @@ translations inline and the render layer decodes by locale automatically):
   display label (schema `enumLabels` for the default language, `enumLabelsI18n`
   per locale). Never store a translated string as the enum value.
 
+UI chrome text (buttons, nav, labels written in code — not CMS content) goes in
+`/messages/{locale}.json` and is read with `useTranslations()` from `talizen` (v0.2.1+):
+`const t = useTranslations("home"); t("title")`. Do not hand-roll a big in-code
+dictionary keyed by locale. Use CMS `_i18n` for content, `useTranslations` for chrome.
+
 Three invariants (do not violate):
 
 1. Enums store stable keys; translate labels, not values.
