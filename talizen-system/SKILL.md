@@ -132,22 +132,29 @@ Routing (handled by the platform; Pages-Router style):
 
 - Default locale has NO URL prefix (`/about`); other locales are prefixed
   (`/zh/about`). The same page files serve all locales.
-- `getServerSideProps` and `generateMetadata` receive `context.locale`,
-  `context.locales`, `context.defaultLocale`. In any component, read the current
-  language with `useLocale()` from `talizen` (v0.2.0+) — no prop-threading.
+- Read the current language by context, not by prop-threading:
+  - In `getServerSideProps` / `generateMetadata` (server-side, **not** component
+    render): use `context.locale` / `context.locales` / `context.defaultLocale`, or
+    `getLocale()` from `talizen` (v0.2.3+). Do **not** call the `useLocale()` hook here.
+  - In a component: `useLocale()` (v0.2.0+).
+  - (This mirrors next-intl's `getLocale`/`getTranslations` server functions vs the
+    `useLocale`/`useTranslations` component hooks.)
 - For internal links use talizen's `<Link>` (auto-prefixes the current locale):
   `<Link href="/about">About</Link>`. Switch language with an explicit locale:
   `<Link href="/" locale="ja">日本語</Link>` (this also remembers the choice via the
   `CREGHT_LOCALE` cookie). `localeDetection: true` redirects unprefixed visits to the
   visitor's preferred locale (cookie `CREGHT_LOCALE` -> Accept-Language).
 
-Content is **field-level** (one item holds all languages; the platform stores
-translations inline and the render layer decodes by locale automatically):
+Content is **field-level** (one item holds all languages; translations are stored
+inline and `talizen/cms` decodes them by the current locale automatically on read):
 
 - Translated field values live under a reserved `_i18n` key on the content body:
-  `{ title: "Hello", _i18n: { zh: { title: "你好" } } }`. Untranslated fields fall
-  back to the default language, so page code just reads `item.title` — no
-  per-locale branching in the template.
+  `{ title: "Hello", _i18n: { zh: { title: "你好" } } }`. When you read content via
+  `listContents`/`getContent` from `talizen/cms` (v0.2.3+), the client overlays
+  `_i18n[locale]` and strips the container, so page code just reads `item.title` —
+  no per-locale branching. Untranslated fields fall back to the default language.
+  (Decode is client-side in the `talizen` package — same in SSR, browser, and the
+  editor preview — so it needs the site's `talizen` ≥ 0.2.3.)
 - Mark which fields translate with `localizable: true` in the collection schema.
   Non-localizable fields (booleans, numbers, relations, and enum values) are
   shared across locales.
@@ -156,9 +163,11 @@ translations inline and the render layer decodes by locale automatically):
   per locale). Never store a translated string as the enum value.
 
 UI chrome text (buttons, nav, labels written in code — not CMS content) goes in
-`/messages/{locale}.json` and is read with `useTranslations()` from `talizen` (v0.2.1+):
-`const t = useTranslations("home"); t("title")`. Do not hand-roll a big in-code
-dictionary keyed by locale. Use CMS `_i18n` for content, `useTranslations` for chrome.
+`/messages/{locale}.json` and is read with `useTranslations()` from `talizen` (v0.2.1+)
+in a component — `const t = useTranslations("home"); t("title")` — or with
+`getTranslations()` (v0.2.3+) in `getServerSideProps` / `generateMetadata`. Do not
+hand-roll a big in-code dictionary keyed by locale. Use CMS `_i18n` for content,
+`useTranslations`/`getTranslations` for chrome.
 
 Three invariants (do not violate):
 
