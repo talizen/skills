@@ -24,8 +24,11 @@ Use the `references/*.md` files for detailed examples.
   `getStaticProps`, or `getStaticPaths`.
 - Pages live in `/page` as `.tsx` React components. Keep reusable UI in
   `/component` or another shared components directory.
-- Use native anchors such as `<a href="/about">...</a>` for navigation. Do not
-  import `Link` from `talizen`, `next/link`, or router libraries.
+- Use native anchors `<a href="/about">...</a>` for navigation, or — for internal
+  links in a multilingual site — talizen's locale-aware `<Link>`
+  (`import { Link } from "talizen"`, v0.2.0+), which auto-prefixes the current
+  locale. Do not import `next/link`, `next/router`, `next/navigation`, or other
+  router libraries.
 - Prefer `getServerSideProps(context)` for route params and first-render data.
   Read dynamic params from `context.params`; do not use client-side param hooks
   when SSR params are available.
@@ -95,6 +98,12 @@ canonical path returned by lint/validation; for example,
 Files like `/page/XXXX.canvas.tsx` are canvas preview entries used by the
 platform editor, not normal route files to generate by hand.
 
+Localized routes: when `i18n` is configured, the default locale has no prefix
+(`/about`) while other locales are prefixed (`/zh/about`). The same page files
+serve all locales via `context.locale`; you may additionally add per-locale files
+(`/page/zh/About.tsx`) to override one locale. `index` maps to its folder root
+(`/page/zh/Index.tsx` -> `/zh`). See the Internationalization section.
+
 ## CMS
 
 Use `talizen/cms` in `getServerSideProps`, then pass plain serializable props to
@@ -108,6 +117,52 @@ the page component.
 - Read `/types/cms.d.ts` for generated collection shapes.
 
 For examples, see `references/CMS.md`.
+
+## Internationalization (i18n)
+
+Enable multilingual by adding `i18n` to `talizen.config.ts`:
+
+```ts
+export default {
+  i18n: { defaultLocale: "en", locales: ["en", "zh", "ja"], localeDetection: true },
+}
+```
+
+Routing (handled by the platform; Pages-Router style):
+
+- Default locale has NO URL prefix (`/about`); other locales are prefixed
+  (`/zh/about`). The same page files serve all locales.
+- `getServerSideProps` and `generateMetadata` receive `context.locale`,
+  `context.locales`, `context.defaultLocale`. In any component, read the current
+  language with `useLocale()` from `talizen` (v0.2.0+) — no prop-threading.
+- For internal links use talizen's `<Link>` (auto-prefixes the current locale):
+  `<Link href="/about">About</Link>`. Switch language with an explicit locale:
+  `<Link href="/" locale="ja">日本語</Link>` (this also remembers the choice via the
+  `CREGHT_LOCALE` cookie). `localeDetection: true` redirects unprefixed visits to the
+  visitor's preferred locale (cookie `CREGHT_LOCALE` -> Accept-Language).
+
+Content is **field-level** (one item holds all languages; the platform stores
+translations inline and the render layer decodes by locale automatically):
+
+- Translated field values live under a reserved `_i18n` key on the content body:
+  `{ title: "Hello", _i18n: { zh: { title: "你好" } } }`. Untranslated fields fall
+  back to the default language, so page code just reads `item.title` — no
+  per-locale branching in the template.
+- Mark which fields translate with `localizable: true` in the collection schema.
+  Non-localizable fields (booleans, numbers, relations, and enum values) are
+  shared across locales.
+- Enum/select fields: the stored value is a **stable key**; translate only the
+  display label (schema `enumLabels` for the default language, `enumLabelsI18n`
+  per locale). Never store a translated string as the enum value.
+
+Three invariants (do not violate):
+
+1. Enums store stable keys; translate labels, not values.
+2. Relations and links reference a stable id, never a localized slug.
+3. Untranslated fields fall back to the default language.
+
+For the full model, the AI translation workflow, per-locale slugs, and query
+patterns, see `references/I18N.md`.
 
 ## Forms
 
@@ -300,6 +355,8 @@ The end user of the Talizen AI assistant is typically non-technical:
 ## References
 
 - `references/CMS.md` for CMS fetching patterns
+- `references/I18N.md` for the multilingual model, translation workflow, and
+  per-locale slugs / relations
 - `references/FORM.md` for form payloads and schema creation
 - `references/SEO.md` for metadata fields and SEO migration
 - `references/CSS.md` for Tailwind v4 site CSS conventions
