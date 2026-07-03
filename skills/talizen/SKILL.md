@@ -102,6 +102,8 @@ checking the relevant guidance.
 - `references/cms.md`: CMS data fetching and generated schema usage.
 - `references/forms.md`: form submissions and payload typing.
 - `references/seo.md`: site and page metadata.
+- `references/i18n.md`: multilingual sites — locale routing, reading the
+  locale, `_i18n` content storage, and `/messages` UI text.
 - `references/css.md`: Tailwind v4 and `index.css` conventions.
 - `references/sitemap.md`: root-level sitemap generation.
 - `references/carousel.md`: carousel/slideshow default approach.
