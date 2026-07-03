@@ -1,20 +1,29 @@
-# Site-level `index.css`
+# Talizen CSS And Tailwind
 
-This document explains how to add CSS and Tailwind v4 configuration in the Talizen platform.
+Talizen uses Tailwind CSS v4.
 
-## Purpose
+## Component Styling
 
-A dedicated site file lets authors define Tailwind directives (`@theme`, `@utility`, `@layer`, etc.), theme tokens, and custom utilities without inline styles on every component.
+- Use utility classes for component styling.
+- Avoid inline `style` props except for genuinely dynamic values that cannot be
+  represented with classes or CSS variables.
+- Do not add ad-hoc `<style>` tags in page components.
+- Do not create arbitrary extra CSS files for one-off component styling.
 
-This file supports both plain CSS and Tailwind directives.
+When adding color transitions, drive the color from one source to avoid double
+hover transitions. Either let children inherit the parent color or control the
+child color with a single hover or `group-hover` rule.
 
-## Minimal example
+## Site-Level `index.css`
 
-Define brand tokens and custom utilities:
+Use `/index.css` for site-level Tailwind source such as `@theme`, `@utility`,
+and base layers. A dedicated site file lets you define theme tokens and custom
+utilities without inline styles on every component. This file supports both
+plain CSS and Tailwind directives.
+
+Minimal example:
 
 ```css
-/* index.css */
-
 @theme inline {
   --color-brand: #005aa7;
   --color-brand-foreground: #ffffff;
