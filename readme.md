@@ -39,3 +39,19 @@ bunx skills add talizen/skills -g -y
 ```
 
 After installation, supported Codex/agent environments will automatically load the corresponding skill guidance when working with Talizen projects.
+
+## Update
+
+Update to the latest version with `npx`:
+
+```bash
+npx skills update talizen
+```
+
+Or use `bunx`:
+
+```bash
+bunx skills update talizen
+```
+
+Re-running the add command above also works — it is idempotent and pulls the latest.
