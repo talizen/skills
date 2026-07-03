@@ -18,15 +18,29 @@ canonical path returned by lint or platform validation; for example,
 Files like `/page/XXXX.canvas.tsx` are canvas preview entries used by the
 platform editor, not normal route files to generate by hand.
 
+For localized routing (locale prefixes and per-locale page files), see
+`references/i18n.md`.
+
 ## Navigation
 
-Use native anchors:
+Use native anchors for navigation:
 
 ```tsx
 <a href="/about">About</a>
 ```
 
-Do not import `Link` from `talizen`, `next/link`, or any router library.
+On a multilingual site, use talizen's locale-aware `<Link>` for internal links —
+it auto-prefixes the current locale, so a link never drops the visitor out of
+their language (a plain `<a>` does not add the prefix). See `references/i18n.md`.
+
+```tsx
+import { Link } from "talizen"
+
+<Link href="/about">About</Link>
+```
+
+Do not import `next/link`, `next/router`, `next/navigation`, or any other router
+library. talizen's own `<Link>` is the only allowed link component.
 
 ## Data Loading
 
@@ -86,6 +100,10 @@ Rules:
   them.
 - For React-dependent esm.sh packages, use `?external=react` so they use the
   host React copy.
+- If you see duplicate-React symptoms such as `Cannot read properties of null
+  (reading 'useState')` with both `react.mjs` and an esm.sh package in the stack,
+  add `?external=react` to that package URL, including React wrapper subpaths
+  such as `swiper/react`.
 - Keep the import specifier exactly the same as the `imports` key.
 - Talizen's compiler supports Vite-style local asset queries for relative imports:
   `import assetUrl from "./asset.ext?url"` returns a browser-accessible Blob URL,
@@ -117,9 +135,44 @@ Do not use `defineConfig` from `talizen/config`.
 - `metadata` for global SEO.
 - `customCode.head` and `customCode.body` for small analytics, verification, or
   script snippets not covered by structured metadata.
+- `redirects` for site-level URL redirects (see below).
 
 Do not duplicate metadata in `customCode`; prefer structured `metadata` whenever
 the field fits.
+
+## Redirects
+
+Configure site-level redirects with the `redirects` array in `talizen.config.ts`.
+This is the Talizen equivalent of Next.js `redirects()`. Because the config must
+be a plain object, `redirects` is an array literal, not an `async` function.
+
+Each rule has:
+
+- `source`: path to match. Supports exact matches (`/old-page`) and a trailing
+  wildcard segment (`/blog/*`).
+- `destination`: target path. May be an internal path (`/new-page`), a wildcard
+  backreference (`/posts/*`), an absolute URL, or a protocol-relative URL.
+- `permanent`: `true` for a 308 permanent redirect (best for SEO), `false` for a
+  307 temporary redirect.
+
+Rules match in order and the first match wins; a rule whose target would match
+itself is skipped. Redirects run before page routing, so they take precedence
+over pages and `/public` files, and the original query string is preserved for
+internal targets.
+
+```ts
+import type { Redirect } from "talizen";
+
+export default {
+  redirects: [
+    { source: "/old-page", destination: "/new-page", permanent: true },
+    { source: "/blog/*", destination: "/posts/*", permanent: false },
+  ] satisfies Redirect[],
+};
+```
+
+For per-request or conditional redirects that depend on data, return `redirect`
+from `getServerSideProps` instead of using `redirects`.
 
 ## Package Types
 
