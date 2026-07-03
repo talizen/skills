@@ -204,5 +204,8 @@ Common return shape:
   alternative data-loading pattern.
 - Always use the generated schema in `/types/cms.d.ts` for content shape. (This file is system-generated and cannot be edited)
 - Use optional chaining for nested fields, especially `body`.
+- On multilingual sites, `listContents` / `getContent` / `getContentWithPrevNext` return
+  each item already decoded to the current locale — just read the fields; don't read or
+  merge `_i18n` yourself. See `references/I18N.md`.
 - Do not rely on old helper names from legacy docs.
 - When updating and creating content, follow the jsonSchema definition of the cms collection
