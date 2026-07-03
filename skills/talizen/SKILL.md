@@ -60,8 +60,8 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 
 ## Error Trigger
 
-When tool output contains `LINT_ERROR`, `BROWSER_ERROR_RENDER`, a build failure,
-or a runtime failure, immediately activate the error-handling protocol by
+When a typecheck, build, or lint/validate command fails, or the user reports a
+runtime or browser error, immediately activate the error-handling protocol by
 reading `references/error-handling.md`. Do not perform speculative fixes before
 checking the relevant guidance.
 
@@ -88,8 +88,8 @@ checking the relevant guidance.
   registration yet; the Talizen platform does not support them. If users need
   similar functionality, implement only the frontend portion and clearly remind
   them that authenticated backend behavior is not available yet.
-- When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
-  error, the first response must be to read and follow
+- When a typecheck, build, lint/validate, or user-reported runtime or browser
+  error occurs, the first response must be to read and follow
   `references/error-handling.md`. Do not make speculative code changes before
   checking that guidance.
 
