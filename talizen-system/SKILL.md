@@ -4,8 +4,7 @@ description: >
   Guidance for Talizen platform apps. Read this skill before editing project files
   or giving Talizen-specific advice (talizen.config.ts, /page routes, CMS/form, Tailwind v4,
   SEO/metadata, importMap, platform tools). Examples: "Build a website for a coffee shop",
-  "Create an About page", "Preview this page", or "Preview this component". Not required for
-  greetings or non-project chat.
+  "Create an About page", "Optimize SEO", "Add a carousel", Not required for greetings or non-project chat.
 ---
 
 # Talizen
