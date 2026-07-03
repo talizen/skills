@@ -46,7 +46,7 @@ Use the `references/*.md` files for detailed guidance on each topic.
   similar functionality, implement only the frontend portion and clearly remind
   them that authenticated backend behavior is not available yet.
 - When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
-  error, the first response must be to follow `references/ERROR_HANDLING.md`.
+  error, the first response must be to follow `references/error-handling.md`.
   Do not make speculative code changes before checking its retry limits and
   known non-fixable cases.
 
@@ -54,7 +54,7 @@ Use the `references/*.md` files for detailed guidance on each topic.
 
 When tool output contains `LINT_ERROR`, `BROWSER_ERROR_RENDER`, a build failure,
 or a runtime failure, immediately activate the error-handling protocol by
-following `references/ERROR_HANDLING.md`. Do not perform speculative fixes
+following `references/error-handling.md`. Do not perform speculative fixes
 before checking the relevant guidance.
 
 ## Default Workflow
@@ -70,7 +70,7 @@ before checking the relevant guidance.
    assistant.
 6. Run `lint` whenever page or component code changed.
 7. If lint, typecheck, build, preview, browser rendering, or runtime validation
-   reports any error, follow `references/ERROR_HANDLING.md` immediately before
+   reports any error, follow `references/error-handling.md` immediately before
    any fix action. Apply its retry limits and known non-fixable cases.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
@@ -95,15 +95,16 @@ The end user of the Talizen AI assistant is typically non-technical:
 
 ## References
 
-- `references/SITE_CODE.md` for routing, navigation, data loading, local imports,
+- `references/site-code.md` for routing, navigation, data loading, local imports,
   the import map, `talizen.config.ts`, redirects, package types, and component
   registries
-- `references/CMS.md` for CMS fetching patterns
-- `references/I18N.md` for the multilingual model, translation workflow, and
+- `references/cms.md` for CMS fetching patterns
+- `references/i18n.md` for the multilingual model, translation workflow, and
   per-locale slugs / relations
-- `references/FORM.md` for form payloads and schema creation
-- `references/SEO.md` for metadata fields and SEO migration
-- `references/CSS.md` for Tailwind v4 component styling and site CSS conventions
-- `references/CAROUSEL.md` for carousel/slideshow setup
-- `references/ERROR_HANDLING.md` for bounded lint, typecheck, build, preview,
+- `references/forms.md` for form payloads and schema creation
+- `references/seo.md` for metadata fields and SEO migration
+- `references/css.md` for Tailwind v4 component styling and site CSS conventions
+- `references/carousel.md` for carousel/slideshow setup
+- `references/sitemap.md` for root-level sitemap generation
+- `references/error-handling.md` for bounded lint, typecheck, build, preview,
   browser, runtime, and external-resource error handling

@@ -19,7 +19,7 @@ Files like `/page/XXXX.canvas.tsx` are canvas preview entries used by the
 platform editor, not normal route files to generate by hand.
 
 For localized routing (locale prefixes and per-locale page files), see
-`references/I18N.md`.
+`references/i18n.md`.
 
 ## Navigation
 
@@ -31,7 +31,7 @@ Use native anchors for navigation:
 
 On a multilingual site, use talizen's locale-aware `<Link>` for internal links —
 it auto-prefixes the current locale, so a link never drops the visitor out of
-their language (a plain `<a>` does not add the prefix). See `references/I18N.md`.
+their language (a plain `<a>` does not add the prefix). See `references/i18n.md`.
 
 ```tsx
 import { Link } from "talizen"
@@ -72,7 +72,7 @@ render as a site page by itself.
 
 ## Component Registries And Effects
 
-For carousels and slideshows, see `references/CAROUSEL.md`.
+For carousels and slideshows, see `references/carousel.md`.
 
 For shadcn/ui-style registry components:
 

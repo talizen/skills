@@ -206,6 +206,6 @@ Common return shape:
 - Use optional chaining for nested fields, especially `body`.
 - On multilingual sites, `listContents` / `getContent` / `getContentWithPrevNext` return
   each item already decoded to the current locale — just read the fields; don't read or
-  merge `_i18n` yourself. See `references/I18N.md`.
+  merge `_i18n` yourself. See `references/i18n.md`.
 - Do not rely on old helper names from legacy docs.
 - When updating and creating content, follow the jsonSchema definition of the cms collection
