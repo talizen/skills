@@ -2,7 +2,7 @@
 name: talizen
 description: >
   Guidance for Talizen platform apps. Read this skill before editing project files
-  or giving Talizen-specific advice (talizen.config.ts, /page routes, CMS/form, Tailwind v4,
+  or giving Talizen-specific advice (talizen.config.ts, /page routes, CMS/form/Func, Tailwind v4,
   SEO/metadata, importMap, platform tools). Examples: "Build a website for a coffee shop",
   "Create an About page", "Optimize SEO", "Add a carousel", Not required for greetings or non-project chat.
 ---
@@ -11,7 +11,7 @@ description: >
 
 Talizen apps are React-based websites with file-based routes under `/page`, a
 root `talizen.config.ts`, Tailwind v4 styling, and platform APIs for CMS, forms,
-metadata, import maps, linting, previews, and versioning.
+Func, metadata, import maps, linting, previews, and versioning.
 
 Use this file for the non-negotiable platform rules and the default workflow.
 Use the `references/*.md` files for detailed guidance on each topic.
@@ -41,10 +41,11 @@ Use the `references/*.md` files for detailed guidance on each topic.
   like `../lib/utils` or `./lib/utils` from the importing file.
 - Use `metadata` for SEO instead of custom `seo` fields or raw `<title>` /
   `<meta name="description">` tags.
-- Do not implement authenticated backend data operations such as user login or
-  registration yet; the Talizen platform does not support them. If users need
-  similar functionality, implement only the frontend portion and clearly remind
-  them that authenticated backend behavior is not available yet.
+- For simple backend workflows such as booking, RSVP, lead capture, availability
+  checks, status updates, and JSON-table reads/writes, use Talizen Func. Do not
+  fake persistent backend state in client code, do not expose project IDs, and
+  do not create `/func/*` pages. Read `references/func.md` before writing Func
+  code or client code that calls Func.
 - When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
   error, the first response must be to follow `references/error-handling.md`.
   Do not make speculative code changes before checking its retry limits and
@@ -102,6 +103,8 @@ The end user of the Talizen AI assistant is typically non-technical:
 - `references/i18n.md` for the multilingual model, translation workflow, and
   per-locale slugs / relations
 - `references/forms.md` for form payloads and schema creation
+- `references/func.md` for project-level Func code, JSON-table access,
+  multi-method files, and client-side `invoke("file.method")` calls
 - `references/seo.md` for metadata fields and SEO migration
 - `references/css.md` for Tailwind v4 component styling and site CSS conventions
 - `references/carousel.md` for carousel/slideshow setup
