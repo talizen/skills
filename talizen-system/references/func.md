@@ -33,13 +33,17 @@ Do not use Func for:
 - Custom identity/session systems, including OAuth callbacks and token
   exchange. Use the platform project auth APIs instead.
 
+For login, registration, logout, current user, OAuth/social login, and account
+UI, read `references/auth.md` and use the browser-side `talizen/auth` SDK from
+page/component code.
+
 ## Func Keys And Methods
 
 Each Func has a project-unique key. Treat the key like an extensionless file
 path:
 
-- Good: `booking`, `booking/admin`, `user/auth`
-- Avoid: `booking.js`, `user/auth.ts`, `auth.login`
+- Good: `booking`, `booking/admin`, `profile/settings`
+- Avoid: `booking.js`, `user/auth.ts`, `auth.login`, `user/auth.login`
 
 Dots are reserved for method invocation. The client call format is:
 
@@ -50,7 +54,8 @@ invoke("file.method", input)
 Examples:
 
 - `invoke("booking.create", input)` calls Func key `booking`, method `create`.
-- `invoke("user/auth.login", input)` calls Func key `user/auth`, method `login`.
+- `invoke("profile/settings.update", input)` calls Func key
+  `profile/settings`, method `update`.
 - `invoke("booking", input)` calls Func key `booking`, method `main`.
 
 If a Func contains only one operation, implement `main`. If a feature has
@@ -58,88 +63,103 @@ closely related operations, put multiple exported methods in one Func file.
 
 ## Writing Func Code
 
-Current Func runtime executes synchronous JavaScript with `goja`.
+Func code can be authored as TypeScript. The platform compiles it with esbuild
+and runs it in a synchronous JavaScript runtime.
 
 Rules:
 
-1. Export methods with CommonJS-style `exports.method = function(input, ctx)`.
-2. Use `exports.main = function(input, ctx)` for the default method.
-3. Do not use `async`, `await`, `Promise`, ESM `import`, or ESM `export`.
-4. Do not write a manual `main` dispatcher. Export each callable method
+1. Export methods with ESM syntax: `export function method(input, ctx)`.
+2. Use `export function main(input, ctx)` for the default method.
+3. Put all platform runtime access behind `ctx`.
+4. Import only TypeScript types from `talizen/func-runtime` when needed.
+5. Do not use `async`, `await`, or `Promise` unless the platform explicitly
+   adds async completion support.
+6. Do not write a manual `main` dispatcher. Export each callable method
    directly.
-5. Validate and normalize all input inside the Func.
-6. Return structured JSON. Use expected business results such as
+7. Validate and normalize all input inside the Func.
+8. Return structured JSON. Use expected business results such as
    `{ ok: false, code: "slot_taken" }` instead of throwing.
-7. Throw only for unexpected failures or invalid requests that should surface as
+9. Throw only for unexpected failures or invalid requests that should surface as
    errors.
 
-Available globals:
+Preferred type import:
 
-- `data.get(tableKey, id)`
-- `data.query(tableKey, query)`
-- `data.insert(tableKey, body)`
-- `data.update(tableKey, id, body)`
-- `data.delete(tableKey, id)`
-- `auth.currentUser()`
-- `auth.requireUser()`
+```ts
+import type { TalizenFuncContext } from "talizen/func-runtime"
+
+export function create(input, ctx: TalizenFuncContext) {
+  return ctx.db.insert("appointments", input)
+}
+```
+
+Available helpers:
+
+- `ctx.db.get(tableKey, id)`
+- `ctx.db.query(tableKey, query)`
+- `ctx.db.insert(tableKey, body)`
+- `ctx.db.update(tableKey, id, body)`
+- `ctx.db.delete(tableKey, id)`
+- `ctx.auth.currentUser()`
+- `ctx.auth.requireUser()`
+- `ctx.cache.get(key)`
+- `ctx.cache.set(key, value, ttlSeconds)`
+- `ctx.cache.del(key)`
+- `ctx.cache.incr(key, delta?)`
+- `ctx.cache.expire(key, ttlSeconds)`
+- `ctx.request.host`, `ctx.request.ip`, `ctx.request.method`, `ctx.request.path`
+- `ctx.request.headers.get(name)`
+- `ctx.request.cookies.get(name)`
+- `ctx.cookies.get(name)`
+- `ctx.cookies.set(name, value, options?)`
+- `ctx.cookies.delete(name, options?)`
 - `console.log/warn/error`
-- `ctx.user_id`, `ctx.trace_id`, and optional `ctx.extra`
+- `ctx.trace_id` and optional `ctx.extra`
 
-`ctx.project_id` and `ctx.site_id` are intentionally not visible to Func code.
-The platform uses them internally for project isolation.
+Do not use legacy globals such as `data`, `db`, `auth`, or `cache`. Do not use
+CommonJS exports such as `exports.method = ...` or `module.exports`. New Func
+code must use ESM exports and the `(input, ctx)` signature.
+
+`ctx.project_id`, `ctx.site_id`, and platform user IDs are intentionally not
+visible to Func code. The platform uses them internally for project isolation.
+For browser visitor identity, use `ctx.auth.currentUser()` or
+`ctx.auth.requireUser()`.
 
 Redis helpers may exist behind the same Func runtime, but only use them after
 the project confirms Redis proxy support is enabled. For ordinary booking and
-lead flows, prefer `data.*`.
+lead flows, prefer `ctx.db.*`.
 
-## Project Auth
+## Auth In Func
 
-Use `talizen/auth` on the page for login state:
+Use platform auth helpers inside Func only for protected business actions:
 
 ```ts
-import {
-  currentUser,
-  listAuthProviders,
-  login,
-  loginWithOAuth,
-  logout,
-  register
-} from "talizen/auth"
+import type { TalizenFuncContext } from "talizen/func-runtime"
 
-await register(input)
-await login(input)
-const providers = await listAuthProviders()
-await loginWithOAuth("github", { redirectUrl: "/account" })
-const user = await currentUser()
-await logout()
-```
-
-Before writing auth payloads, read the `talizen/auth` type definitions from the
-`talizen` version used by the current project. Do not create user tables, store
-passwords, implement sessions, or write OAuth callback Funcs.
-
-Inside Func, use the injected auth helper:
-
-```js
-exports.create = function(input) {
-  const user = auth.requireUser()
-  return data.insert("appointments", { userId: user.id, date: input.date })
+export function create(input, ctx: TalizenFuncContext) {
+  const user = ctx.auth.requireUser()
+  return ctx.db.insert("appointments", { userId: user.id, date: input.date })
 }
 ```
+
+`ctx.auth.currentUser()` returns the project auth user or `null`.
+`ctx.auth.requireUser()` throws `login required` when the visitor is not logged in.
+These helpers do not create accounts or sessions. Registration, password login,
+OAuth login, logout, and current-user UI are browser-side platform auth
+operations from `talizen/auth`; see `references/auth.md`.
 
 ## JSON Tables
 
 Func stores persistent project data through project JSON tables. A table must
 exist before a Func writes to it. The table key is the string passed to
-`data.*`, for example `appointments`.
+`ctx.db.*`, for example `appointments`.
 
 Use JSON Schema only to describe and validate table record shape. Do not design
 Func features that require dynamic SQL migrations or table DDL.
 
 Common query shape:
 
-```js
-data.query("appointments", {
+```ts
+ctx.db.query("appointments", {
   where: { email: "person@example.com" },
   limit: 20,
   offset: 0,
@@ -154,17 +174,17 @@ filters that the platform can index later.
 
 Func key: `booking`
 
-```js
+```ts
 function required(value, field) {
   const text = String(value || "").trim()
   if (!text) throw new Error(field + " is required")
   return text
 }
 
-exports.create = function(input) {
+export function create(input, ctx) {
   const date = required(input.date, "date")
   const time = required(input.time, "time")
-  const existing = data.query("appointments", {
+  const existing = ctx.db.query("appointments", {
     where: { date: date, time: time, status: "confirmed" },
     limit: 1
   })
@@ -172,7 +192,7 @@ exports.create = function(input) {
     return { ok: false, code: "slot_taken", message: "This time is unavailable." }
   }
 
-  const inserted = data.insert("appointments", {
+  const inserted = ctx.db.insert("appointments", {
     name: required(input.name, "name"),
     email: required(input.email, "email").toLowerCase(),
     date: date,
@@ -189,8 +209,8 @@ Expected table key: `appointments`. Its JSON Schema should include at least
 
 ## Calling Func From A Page
 
-Use the SDK exported by `talizen`. For exact declarations, fetch package types
-only when needed:
+Use the SDK exported by `talizen/func`. For exact declarations, fetch package
+types only when needed:
 
 ```ts
 fetch_module_types("talizen")
@@ -199,7 +219,7 @@ fetch_module_types("talizen")
 Common client-side call:
 
 ```tsx
-import { invoke, TalizenFuncError } from "talizen"
+import { invoke, TalizenFuncError } from "talizen/func"
 
 type BookingResult =
   | { ok: true; id: string }
@@ -226,7 +246,7 @@ Rules for page code:
 
 - Call Func from event handlers for mutations.
 - Keep all persistent writes inside Func, not in React state alone.
-- Import from `talizen`, not from a relative SDK path.
+- Import Func client helpers from `talizen/func`, not from a relative SDK path.
 - Use `invoke("file.method", input)` for normal use.
 - Use `invoke("file", input)` only when the Func exports `main`.
 - Handle expected `{ ok: false, code, message }` business responses separately

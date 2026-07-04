@@ -46,11 +46,12 @@ Use the `references/*.md` files for detailed guidance on each topic.
   fake persistent backend state in client code, do not expose project IDs, and
   do not create `/func/*` pages. Read `references/func.md` before writing Func
   code or client code that calls Func.
-- Use Talizen platform auth for user login, registration, logout, current user
-  state, and OAuth/social login providers configured in the project. Do not
-  create a `user` / `users` / `auth_users` database table for account identity,
-  and do not write Func code that implements passwords, sessions, OAuth
-  callbacks, login, or registration.
+- Use the browser-side `talizen/auth` SDK for user login, registration, logout,
+  current user state, and OAuth/social login providers configured in the
+  project. Do not create a `user` / `users` / `auth_users` database table for
+  account identity, and do not write Func code that implements passwords,
+  sessions, OAuth callbacks, login, or registration. Read `references/auth.md`
+  before building login, signup, account, OAuth, or protected UI flows.
 - Before using `talizen/auth`, read the type definitions from the `talizen`
   version used by the current project and follow those request/response models.
 - When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
@@ -85,12 +86,14 @@ before checking the relevant guidance.
 
 ## Func and Auth
 
-Read `references/func.md` before using Func or database table tools, or writing client code
-that calls Func/auth. This includes requests involving custom backend actions,
-`invoke(...)`, `/api/func`, database tables, record CRUD, booking/RSVP/lead capture,
-protected user-specific business logic, login, registration, logout, current
-user state, or any question about whether to create a user database table or write auth
-logic.
+Read `references/auth.md` before writing login, registration, logout, current
+user, OAuth/social login, account, or protected UI code.
+
+Read `references/func.md` before using Func or database table tools, or writing
+client code that calls Func. This includes requests involving custom backend
+actions, `invoke(...)`, `/api/func`, database tables, record CRUD,
+booking/RSVP/lead capture, protected user-specific business logic, or any
+question about whether to create a user database table or write backend logic.
 
 If the user asks only for a component, make it visible in a page whenever
 possible, especially when they ask to preview it. A standalone component cannot
@@ -119,6 +122,8 @@ The end user of the Talizen AI assistant is typically non-technical:
 - `references/i18n.md` for the multilingual model, translation workflow, and
   per-locale slugs / relations
 - `references/forms.md` for form payloads and schema creation
+- `references/auth.md` for platform auth, password login/register, current user,
+  logout, OAuth/social login providers, and protected UI patterns
 - `references/func.md` for project-level Func code, JSON-table access,
   multi-method files, platform auth usage, and client-side
   `invoke("file.method")` calls
