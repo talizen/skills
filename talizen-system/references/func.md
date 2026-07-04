@@ -39,10 +39,12 @@ Use Func only for business logic around an authenticated user, such as booking,
 orders, private profile settings, or permission checks. Inside Func, read the
 visitor from platform auth:
 
-```js
+```ts
+import { auth, db } from "talizen/func"
+
 export function create(input) {
   const user = auth.requireUser()
-  const row = data.insert("appointments", {
+  const row = db.insert("appointments", {
     user_id: user.id,
     date: input.date,
     time: input.time,
@@ -65,7 +67,7 @@ When implementing a Func-backed feature:
 4. `list_funcs`
 5. `create_func` or `update_func`
 6. `run_func` with sample input before editing client UI
-7. In page code, call `invoke("file.method", input)` from `talizen`
+7. In page code, call `invoke("file.method", input)` from `talizen/func`
 
 Useful tools:
 
@@ -90,30 +92,44 @@ Call format:
 
 ## Func Code
 
-Prefer ESM exports:
+Func code should be TypeScript. Import runtime-only helpers from `talizen/func`:
 
-```js
-export function main(input) {
+```ts
+import { auth, db, cache } from "talizen/func"
+
+export function main(input: { title?: string }) {
   return { ok: true, input }
 }
 ```
 
+Package rules:
+
+- Client page code: import `invoke` from `talizen/func`.
+- Client auth UI: import `login`, `register`, `logout`, `currentUser` from `talizen/auth`.
+- Func runtime code: import `auth`, `db`, `cache` from `talizen/func`.
+- Never import `talizen/db` or `talizen/cache`; those packages do not exist.
+- Never import Func runtime `auth` from `talizen/auth`.
+
 Multiple methods in one file:
 
-```js
-export function create(input) {
-  const row = data.insert("appointments", input)
+```ts
+import { db } from "talizen/func"
+
+export function create(input: { email: string; date: string; time: string }) {
+  const row = db.insert("appointments", input)
   return { ok: true, id: row.id }
 }
 
-export function list(input) {
-  return data.query("appointments", { limit: input.limit || 20 })
+export function list(input: { limit?: number }) {
+  return db.query("appointments", { limit: input.limit || 20 })
 }
 ```
 
 Rules:
 
 - Do not write a manual `main` dispatcher.
+- Do not import Func auth from `talizen/auth`; `talizen/auth` is for client-side login/register/logout/current user APIs.
+- Do not import `talizen/db` or `talizen/cache`; use `{ db, cache }` from `talizen/func`.
 - Do not use `async`/`await` unless the platform explicitly adds Promise support.
 - Validate user input in Func.
 - Return expected business failures as `{ ok: false, code, message }`.
@@ -122,7 +138,7 @@ Rules:
 ## Database Tables
 
 Create a database table before writing Func code that uses it. The table key is the
-first argument of `data.*`.
+first argument of `db.*`.
 
 Minimal table schema:
 
@@ -139,20 +155,22 @@ Minimal table schema:
 
 Data APIs:
 
-```js
-data.query("appointments", { where: { status: "confirmed" }, limit: 20 })
-data.get("appointments", input.id)
-data.insert("appointments", { email: input.email, status: "confirmed" })
-data.update("appointments", input.id, { status: "cancelled" })
-data.delete("appointments", input.id)
+```ts
+db.query("appointments", { where: { status: "confirmed" }, limit: 20 })
+db.get("appointments", input.id)
+db.insert("appointments", { email: input.email, status: "confirmed" })
+db.update("appointments", input.id, { status: "cancelled" })
+db.delete("appointments", input.id)
 ```
 
 Pagination:
 
-```js
+```ts
+import { db } from "talizen/func"
+
 const page = Math.max(Number(input.page || 1), 1)
 const pageSize = Math.min(Number(input.pageSize || 20), 100)
-return data.query("book", {
+return db.query("book", {
   limit: pageSize,
   offset: (page - 1) * pageSize,
   order_by: "sort desc, id desc"
@@ -163,7 +181,9 @@ return data.query("book", {
 
 Use platform auth helpers inside Func only for protected business actions:
 
-```js
+```ts
+import { auth } from "talizen/func"
+
 export function profile() {
   const user = auth.requireUser()
   return { ok: true, user }
@@ -179,7 +199,7 @@ accounts; registration and login are platform auth operations from `talizen/auth
 Use the Talizen SDK:
 
 ```tsx
-import { invoke } from "talizen"
+import { invoke } from "talizen/func"
 
 const result = await invoke("booking.create", {
   email,
@@ -197,15 +217,17 @@ Table: `appointments`
 
 Func key: `booking`
 
-```js
+```ts
+import { db } from "talizen/func"
+
 export function create(input) {
-  const existing = data.query("appointments", {
+  const existing = db.query("appointments", {
     where: { date: input.date, time: input.time, status: "confirmed" },
     limit: 1
   })
   if (existing.length) return { ok: false, code: "slot_taken", message: "Time unavailable" }
 
-  const row = data.insert("appointments", {
+  const row = db.insert("appointments", {
     email: String(input.email || "").toLowerCase(),
     date: input.date,
     time: input.time,
