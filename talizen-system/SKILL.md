@@ -77,7 +77,7 @@ before checking the relevant guidance.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
 
-## Reference Loading Rules
+## Func and Auth
 
 Read `references/func.md` before using Func/table tools or writing client code
 that calls Func/auth. This includes requests involving custom backend actions,
