@@ -5,15 +5,60 @@ title: Talizen Func Usage
 # Talizen Func Usage
 
 Use Func for small project-level backend workflows: booking, RSVP, lead capture,
-registration/profile actions, availability checks, and JSON-table reads/writes.
+availability checks, protected profile-adjacent business actions, and JSON-table
+reads/writes.
 
 Func and table data are project-scoped. Never ask for, hard-code, expose, or
 send `project_id` / `site_id`; the platform supplies that context internally.
+
+## Auth First Rule
+
+Talizen has built-in platform auth. For user login, registration, logout, and
+current-user state, use the platform auth SDK/API instead of Func or JSON tables.
+
+Do not:
+
+- create `user`, `users`, `auth_user`, or `auth_users` tables for account identity
+- store passwords or password hashes in JSON tables
+- write `user/auth.login`, `user/auth.register`, or similar Func methods for
+  platform account login/registration
+- implement cookies, sessions, tokens, or password verification in user Func code
+
+Do:
+
+```tsx
+import { currentUser, login, logout, register } from "talizen/auth"
+
+await register({ email, password, name })
+await login({ email, password })
+const user = await currentUser()
+await logout()
+```
+
+Use Func only for business logic around an authenticated user, such as booking,
+orders, private profile settings, or permission checks. Inside Func, read the
+visitor from platform auth:
+
+```js
+export function create(input) {
+  const user = auth.requireUser()
+  const row = data.insert("appointments", {
+    user_id: user.id,
+    date: input.date,
+    time: input.time,
+    status: "confirmed"
+  })
+  return { ok: true, id: row.id }
+}
+```
 
 ## Agent Tool Flow
 
 When implementing a Func-backed feature:
 
+0. If the requested feature is login, registration, logout, current user, or
+   account identity, do not create tables or Func; use `talizen/auth` in the
+   client UI.
 1. `list_tables`
 2. `create_table` or `update_table` with `json_schema` for fields
 3. `create_table_record` only when seed/test data is needed
@@ -34,14 +79,14 @@ Useful tools:
 
 Treat a Func key like an extensionless file path:
 
-- Good: `booking`, `user/auth`, `admin/report`
+- Good: `booking`, `profile/settings`, `admin/report`
 - Avoid: `booking.js`, `auth.login`
 
 Call format:
 
 - `invoke("booking", input)` calls key `booking`, method `main`
 - `invoke("booking.create", input)` calls key `booking`, method `create`
-- `invoke("user/auth.login", input)` calls key `user/auth`, method `login`
+- `invoke("admin/report.generate", input)` calls key `admin/report`, method `generate`
 
 ## Func Code
 
@@ -116,7 +161,7 @@ return data.query("book", {
 
 ## Auth In Func
 
-Use platform auth helpers inside Func:
+Use platform auth helpers inside Func only for protected business actions:
 
 ```js
 export function profile() {
@@ -126,7 +171,8 @@ export function profile() {
 ```
 
 `auth.currentUser()` returns the user or `null`. `auth.requireUser()` throws
-`login required` when the visitor is not logged in.
+`login required` when the visitor is not logged in. These helpers do not create
+accounts; registration and login are platform auth operations from `talizen/auth`.
 
 ## Client Call
 
