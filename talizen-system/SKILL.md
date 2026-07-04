@@ -77,6 +77,15 @@ before checking the relevant guidance.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
 
+## Reference Loading Rules
+
+Read `references/func.md` before using Func/table tools or writing client code
+that calls Func/auth. This includes requests involving custom backend actions,
+`invoke(...)`, `/api/func`, JSON tables, record CRUD, booking/RSVP/lead capture,
+protected user-specific business logic, login, registration, logout, current
+user state, or any question about whether to create a user table or write auth
+logic.
+
 If the user asks only for a component, make it visible in a page whenever
 possible, especially when they ask to preview it. A standalone component cannot
 render as a site page by itself. (If page does not exist, create it.)
