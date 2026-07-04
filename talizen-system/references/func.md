@@ -30,7 +30,8 @@ Do not use Func for:
 - Static contact forms that only need `talizen/form`.
 - Long-running jobs, streaming, file processing, or heavy computation.
 - Direct database, Redis, network, token, or credential access from page code.
-- Custom identity/session systems. Use the platform project auth APIs instead.
+- Custom identity/session systems, including OAuth callbacks and token
+  exchange. Use the platform project auth APIs instead.
 
 ## Func Keys And Methods
 
@@ -96,13 +97,26 @@ lead flows, prefer `data.*`.
 Use `talizen/auth` on the page for login state:
 
 ```ts
-import { currentUser, login, logout, register } from "talizen"
+import {
+  currentUser,
+  listAuthProviders,
+  login,
+  loginWithOAuth,
+  logout,
+  register
+} from "talizen/auth"
 
-await register({ email, password, name })
-await login({ email, password })
+await register(input)
+await login(input)
+const providers = await listAuthProviders()
+await loginWithOAuth("github", { redirectUrl: "/account" })
 const user = await currentUser()
 await logout()
 ```
+
+Before writing auth payloads, read the `talizen/auth` type definitions from the
+`talizen` version used by the current project. Do not create user tables, store
+passwords, implement sessions, or write OAuth callback Funcs.
 
 Inside Func, use the injected auth helper:
 
