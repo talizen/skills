@@ -42,9 +42,10 @@ Use the `references/*.md` files for detailed guidance on each topic.
 - Use `metadata` for SEO instead of custom `seo` fields or raw `<title>` /
   `<meta name="description">` tags.
 - Use Talizen platform auth for user login, registration, logout, and current
-  user state. Do not create a `user` / `users` / `auth_users` database table for
+  user state, including OAuth/social login providers configured in the project.
+  Do not create a `user` / `users` / `auth_users` database table for
   account identity, and do not write Func code that implements passwords,
-  sessions, login, or registration. For protected business logic, use Func only
+  sessions, OAuth callbacks, login, or registration. For protected business logic, use Func only
   after platform auth is in place and read the current user with `auth.currentUser()`
   or `auth.requireUser()`.
 - Before using `talizen/auth`, read the type definitions from the `talizen`

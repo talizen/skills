@@ -13,8 +13,9 @@ send `project_id` / `site_id`; the platform supplies that context internally.
 
 ## Auth First Rule
 
-Talizen has built-in platform auth. For user login, registration, logout, and
-current-user state, use the platform auth SDK/API instead of Func or database tables.
+Talizen has built-in platform auth. For user login, OAuth/social login,
+registration, logout, and current-user state, use the platform auth SDK/API
+instead of Func or database tables.
 
 Do not:
 
@@ -22,15 +23,25 @@ Do not:
 - store passwords or password hashes in database tables
 - write `user/auth.login`, `user/auth.register`, or similar Func methods for
   platform account login/registration
+- write OAuth callback, token exchange, or social-login Func methods
 - implement cookies, sessions, tokens, or password verification in user Func code
 
 Do:
 
 ```tsx
-import { currentUser, login, logout, register } from "talizen/auth"
+import {
+  currentUser,
+  listAuthProviders,
+  login,
+  loginWithOAuth,
+  logout,
+  register
+} from "talizen/auth"
 
 await register(input)
 await login(input)
+const providers = await listAuthProviders()
+await loginWithOAuth("github", { redirectUrl: "/account" })
 const user = await currentUser()
 await logout()
 ```
@@ -62,7 +73,7 @@ export function create(input) {
 
 When implementing a Func-backed feature:
 
-0. If the requested feature is login, registration, logout, current user, or
+0. If the requested feature is login, OAuth/social login, registration, logout, current user, or
    account identity, do not create database tables or Func; use `talizen/auth` in the
    client UI.
 1. `list_tables`
@@ -109,7 +120,8 @@ export function main(input: { title?: string }) {
 Package rules:
 
 - Client page code: import `invoke` from `talizen/func`.
-- Client auth UI: import `login`, `register`, `logout`, `currentUser` from `talizen/auth`.
+- Client auth UI: import `login`, `register`, `logout`, `currentUser`,
+  `listAuthProviders`, and `loginWithOAuth` from `talizen/auth`.
 - Func runtime code: import `auth`, `db`, `cache` from `talizen/func-runtime`.
 - Never import `talizen/db` or `talizen/cache`; use `talizen/func-runtime` instead.
 - Never import Func runtime `auth` from `talizen/auth`.
