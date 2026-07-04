@@ -42,7 +42,7 @@ Use the `references/*.md` files for detailed guidance on each topic.
 - Use `metadata` for SEO instead of custom `seo` fields or raw `<title>` /
   `<meta name="description">` tags.
 - Use Talizen platform auth for user login, registration, logout, and current
-  user state. Do not create a `user` / `users` / `auth_users` JSON table for
+  user state. Do not create a `user` / `users` / `auth_users` database table for
   account identity, and do not write Func code that implements passwords,
   sessions, login, or registration. For protected business logic, use Func only
   after platform auth is in place and read the current user with `auth.currentUser()`
@@ -79,11 +79,11 @@ before checking the relevant guidance.
 
 ## Func and Auth
 
-Read `references/func.md` before using Func/table tools or writing client code
+Read `references/func.md` before using Func or database table tools, or writing client code
 that calls Func/auth. This includes requests involving custom backend actions,
-`invoke(...)`, `/api/func`, JSON tables, record CRUD, booking/RSVP/lead capture,
+`invoke(...)`, `/api/func`, database tables, record CRUD, booking/RSVP/lead capture,
 protected user-specific business logic, login, registration, logout, current
-user state, or any question about whether to create a user table or write auth
+user state, or any question about whether to create a user database table or write auth
 logic.
 
 If the user asks only for a component, make it visible in a page whenever
@@ -113,7 +113,7 @@ The end user of the Talizen AI assistant is typically non-technical:
 - `references/i18n.md` for the multilingual model, translation workflow, and
   per-locale slugs / relations
 - `references/forms.md` for form payloads and schema creation
-- `references/func.md` for Func, JSON tables, platform auth usage inside Func,
+- `references/func.md` for Func, database tables, platform auth usage inside Func,
   and client `invoke(...)` calls
 - `references/seo.md` for metadata fields and SEO migration
 - `references/css.md` for Tailwind v4 component styling and site CSS conventions

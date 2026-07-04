@@ -5,21 +5,21 @@ title: Talizen Func Usage
 # Talizen Func Usage
 
 Use Func for small project-level backend workflows: booking, RSVP, lead capture,
-availability checks, protected profile-adjacent business actions, and JSON-table
+availability checks, protected profile-adjacent business actions, and database table
 reads/writes.
 
-Func and table data are project-scoped. Never ask for, hard-code, expose, or
+Func and database table data are project-scoped. Never ask for, hard-code, expose, or
 send `project_id` / `site_id`; the platform supplies that context internally.
 
 ## Auth First Rule
 
 Talizen has built-in platform auth. For user login, registration, logout, and
-current-user state, use the platform auth SDK/API instead of Func or JSON tables.
+current-user state, use the platform auth SDK/API instead of Func or database tables.
 
 Do not:
 
-- create `user`, `users`, `auth_user`, or `auth_users` tables for account identity
-- store passwords or password hashes in JSON tables
+- create `user`, `users`, `auth_user`, or `auth_users` database tables for account identity
+- store passwords or password hashes in database tables
 - write `user/auth.login`, `user/auth.register`, or similar Func methods for
   platform account login/registration
 - implement cookies, sessions, tokens, or password verification in user Func code
@@ -57,7 +57,7 @@ export function create(input) {
 When implementing a Func-backed feature:
 
 0. If the requested feature is login, registration, logout, current user, or
-   account identity, do not create tables or Func; use `talizen/auth` in the
+   account identity, do not create database tables or Func; use `talizen/auth` in the
    client UI.
 1. `list_tables`
 2. `create_table` or `update_table` with `json_schema` for fields
@@ -119,9 +119,9 @@ Rules:
 - Return expected business failures as `{ ok: false, code, message }`.
 - Throw only for unexpected failures.
 
-## Data Tables
+## Database Tables
 
-Create a JSON table before writing Func code that uses it. The table key is the
+Create a database table before writing Func code that uses it. The table key is the
 first argument of `data.*`.
 
 Minimal table schema:
