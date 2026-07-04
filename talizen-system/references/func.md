@@ -40,7 +40,7 @@ orders, private profile settings, or permission checks. Inside Func, read the
 visitor from platform auth:
 
 ```ts
-import { auth, db } from "talizen/func"
+import { auth, db } from "talizen/func-runtime"
 
 export function create(input) {
   const user = auth.requireUser()
@@ -92,10 +92,10 @@ Call format:
 
 ## Func Code
 
-Func code should be TypeScript. Import runtime-only helpers from `talizen/func`:
+Func code should be TypeScript. Import runtime-only helpers from `talizen/func-runtime`:
 
 ```ts
-import { auth, db, cache } from "talizen/func"
+import { auth, db, cache } from "talizen/func-runtime"
 
 export function main(input: { title?: string }) {
   return { ok: true, input }
@@ -106,14 +106,14 @@ Package rules:
 
 - Client page code: import `invoke` from `talizen/func`.
 - Client auth UI: import `login`, `register`, `logout`, `currentUser` from `talizen/auth`.
-- Func runtime code: import `auth`, `db`, `cache` from `talizen/func`.
-- Never import `talizen/db` or `talizen/cache`; those packages do not exist.
+- Func runtime code: import `auth`, `db`, `cache` from `talizen/func-runtime`.
+- Never import `talizen/db` or `talizen/cache`; use `talizen/func-runtime` instead.
 - Never import Func runtime `auth` from `talizen/auth`.
 
 Multiple methods in one file:
 
 ```ts
-import { db } from "talizen/func"
+import { db } from "talizen/func-runtime"
 
 export function create(input: { email: string; date: string; time: string }) {
   const row = db.insert("appointments", input)
@@ -129,7 +129,7 @@ Rules:
 
 - Do not write a manual `main` dispatcher.
 - Do not import Func auth from `talizen/auth`; `talizen/auth` is for client-side login/register/logout/current user APIs.
-- Do not import `talizen/db` or `talizen/cache`; use `{ db, cache }` from `talizen/func`.
+- Do not import `talizen/db` or `talizen/cache`; use `{ db, cache }` from `talizen/func-runtime`.
 - Do not use `async`/`await` unless the platform explicitly adds Promise support.
 - Validate user input in Func.
 - Return expected business failures as `{ ok: false, code, message }`.
@@ -166,7 +166,7 @@ db.delete("appointments", input.id)
 Pagination:
 
 ```ts
-import { db } from "talizen/func"
+import { db } from "talizen/func-runtime"
 
 const page = Math.max(Number(input.page || 1), 1)
 const pageSize = Math.min(Number(input.pageSize || 20), 100)
@@ -182,7 +182,7 @@ return db.query("book", {
 Use platform auth helpers inside Func only for protected business actions:
 
 ```ts
-import { auth } from "talizen/func"
+import { auth } from "talizen/func-runtime"
 
 export function profile() {
   const user = auth.requireUser()
@@ -218,7 +218,7 @@ Table: `appointments`
 Func key: `booking`
 
 ```ts
-import { db } from "talizen/func"
+import { db } from "talizen/func-runtime"
 
 export function create(input) {
   const existing = db.query("appointments", {
