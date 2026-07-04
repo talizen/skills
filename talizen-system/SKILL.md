@@ -46,6 +46,13 @@ Use the `references/*.md` files for detailed guidance on each topic.
   fake persistent backend state in client code, do not expose project IDs, and
   do not create `/func/*` pages. Read `references/func.md` before writing Func
   code or client code that calls Func.
+- Use Talizen platform auth for user login, registration, logout, current user
+  state, and OAuth/social login providers configured in the project. Do not
+  create a `user` / `users` / `auth_users` database table for account identity,
+  and do not write Func code that implements passwords, sessions, OAuth
+  callbacks, login, or registration.
+- Before using `talizen/auth`, read the type definitions from the `talizen`
+  version used by the current project and follow those request/response models.
 - When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
   error, the first response must be to follow `references/error-handling.md`.
   Do not make speculative code changes before checking its retry limits and
@@ -76,6 +83,15 @@ before checking the relevant guidance.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
 
+## Func and Auth
+
+Read `references/func.md` before using Func or database table tools, or writing client code
+that calls Func/auth. This includes requests involving custom backend actions,
+`invoke(...)`, `/api/func`, database tables, record CRUD, booking/RSVP/lead capture,
+protected user-specific business logic, login, registration, logout, current
+user state, or any question about whether to create a user database table or write auth
+logic.
+
 If the user asks only for a component, make it visible in a page whenever
 possible, especially when they ask to preview it. A standalone component cannot
 render as a site page by itself. (If page does not exist, create it.)
@@ -104,7 +120,8 @@ The end user of the Talizen AI assistant is typically non-technical:
   per-locale slugs / relations
 - `references/forms.md` for form payloads and schema creation
 - `references/func.md` for project-level Func code, JSON-table access,
-  multi-method files, and client-side `invoke("file.method")` calls
+  multi-method files, platform auth usage, and client-side
+  `invoke("file.method")` calls
 - `references/seo.md` for metadata fields and SEO migration
 - `references/css.md` for Tailwind v4 component styling and site CSS conventions
 - `references/carousel.md` for carousel/slideshow setup
