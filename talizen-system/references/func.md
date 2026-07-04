@@ -29,11 +29,15 @@ Do:
 ```tsx
 import { currentUser, login, logout, register } from "talizen/auth"
 
-await register({ email, password, name })
-await login({ email, password })
+await register(input)
+await login(input)
 const user = await currentUser()
 await logout()
 ```
+
+Before writing login or registration payloads, read the `talizen/auth` type
+definitions from the `talizen` version used by the current project and follow
+those request/response models.
 
 Use Func only for business logic around an authenticated user, such as booking,
 orders, private profile settings, or permission checks. Inside Func, read the

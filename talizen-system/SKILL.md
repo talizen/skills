@@ -47,6 +47,8 @@ Use the `references/*.md` files for detailed guidance on each topic.
   sessions, login, or registration. For protected business logic, use Func only
   after platform auth is in place and read the current user with `auth.currentUser()`
   or `auth.requireUser()`.
+- Before using `talizen/auth`, read the type definitions from the `talizen`
+  version used by the current project and follow those request/response models.
 - When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
   error, the first response must be to follow `references/error-handling.md`.
   Do not make speculative code changes before checking its retry limits and
