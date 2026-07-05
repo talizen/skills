@@ -56,6 +56,12 @@ Use the `references/*.md` files for detailed guidance on each topic.
   before building login, signup, account, OAuth, or protected UI flows.
 - Before using `talizen/auth`, read the type definitions from the `talizen`
   version used by the current project and follow those request/response models.
+- Password-gated pages should keep protected content out of SSR HTML and client
+  bundles: render a public password gate, verify the password through Func/API,
+  set a signed access cookie, then fetch protected content from Func/API.
+- Article lists with fast-changing like counts should SSR/cache the CMS article
+  list only; fetch like counts after hydration with Func/API and update/toggle
+  likes client-side so the whole page cache is not invalidated by counters.
 - When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
   error, the first response must be to follow `references/error-handling.md`.
   Do not make speculative code changes before checking its retry limits and
