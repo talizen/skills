@@ -286,9 +286,16 @@ Available `getServerSideProps` context helpers:
 
 `getServerSideProps` intentionally does not expose `ctx.db` or `ctx.cache`.
 Business reads/writes should stay in Func code, then be called from SSR through
-`ctx.func.invoke`. If SSR reads cookies, auth, or invokes Func, the render
-runtime treats the response as private/no-store unless a future platform cache
-variant mechanism says otherwise.
+`ctx.func.invoke`.
+
+Render cache behavior:
+
+- `ctx.cookies.*` and `ctx.auth.*` make the SSR response private/no-store.
+- `ctx.func.invoke(...)` can stay cacheable when the Func only reads JSON-table
+  data through `ctx.db.get/query`; the Func returns table/record dependencies to
+  render, and JSON-table updates invalidate the dependent HTML cache.
+- Func code that reads `ctx.cache`, reads cookies/auth, sets cookies, or writes
+  data through `ctx.db.insert/update/delete` makes the SSR response no-store.
 
 ## Agent Checklist
 
