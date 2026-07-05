@@ -56,12 +56,6 @@ Use the `references/*.md` files for detailed guidance on each topic.
   before building login, signup, account, OAuth, or protected UI flows.
 - Before using `talizen/auth`, read the type definitions from the `talizen`
   version used by the current project and follow those request/response models.
-- Password-gated pages should keep protected content out of SSR HTML and client
-  bundles: render a public password gate, verify the password through Func/API,
-  set a signed access cookie, then fetch protected content from Func/API.
-- Article lists with fast-changing like counts should SSR/cache the CMS article
-  list only; fetch like counts after hydration with Func/API and update/toggle
-  likes client-side so the whole page cache is not invalidated by counters.
 - When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
   error, the first response must be to follow `references/error-handling.md`.
   Do not make speculative code changes before checking its retry limits and
@@ -92,7 +86,7 @@ before checking the relevant guidance.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
 
-## Func and Auth
+## Backend Capability Patterns
 
 Read `references/auth.md` before writing login, registration, logout, current
 user, OAuth/social login, account, or protected UI code.
@@ -102,6 +96,18 @@ client code that calls Func. This includes requests involving custom backend
 actions, `invoke(...)`, `/api/func`, database tables, record CRUD,
 booking/RSVP/lead capture, protected user-specific business logic, or any
 question about whether to create a user database table or write backend logic.
+
+Use SSR only for public or cache-friendly first-render data. Do not put login
+state, private user data, writes, or Func calls in `getServerSideProps`; keep
+those flows in browser-side SDK/Func/API interactions.
+
+For password-gated pages, keep protected content out of SSR HTML and client
+bundles: render a public password gate, verify the password through Func/API,
+set a signed access cookie, then fetch protected content from Func/API.
+
+For article lists with fast-changing like counts, SSR/cache the CMS article list
+only; fetch like counts after hydration with Func/API and update/toggle likes
+client-side so the whole page cache is not invalidated by counters.
 
 If the user asks only for a component, make it visible in a page whenever
 possible, especially when they ask to preview it. A standalone component cannot
