@@ -209,8 +209,8 @@ Expected table key: `appointments`. Its JSON Schema should include at least
 
 ## Calling Func From A Page
 
-Use the SDK exported by `talizen/func`. For exact declarations, fetch package
-types only when needed:
+Use the SDK exported by `talizen/func` for browser-side page/component
+interactions. For exact declarations, fetch package types only when needed:
 
 ```ts
 fetch_module_types("talizen")
@@ -253,6 +253,42 @@ Rules for page code:
   from thrown errors.
 - Do not include `project_id`, `site_id`, internal tokens, or table IDs in the
   client payload.
+
+## Calling Func From getServerSideProps
+
+Do not import `talizen/func` inside `getServerSideProps`. Server-side page code
+receives a request context and must use `ctx.func.invoke(...)`:
+
+```ts
+import type { TalizenServerSideContext } from "talizen/server-runtime"
+
+export async function getServerSideProps(ctx: TalizenServerSideContext) {
+  const user = ctx.auth.currentUser()
+  const data = ctx.func.invoke("contact.privateData", {
+    path: ctx.request.path
+  })
+
+  return { props: { user, data } }
+}
+```
+
+Available `getServerSideProps` context helpers:
+
+- `ctx.request.host`, `ctx.request.ip`, `ctx.request.method`, `ctx.request.path`
+- `ctx.request.headers.get(name)`
+- `ctx.request.cookies.get(name)`
+- `ctx.cookies.get(name)`
+- `ctx.cookies.set(name, value, options?)`
+- `ctx.cookies.delete(name, options?)`
+- `ctx.auth.currentUser()`
+- `ctx.auth.requireUser()`
+- `ctx.func.invoke("file.method", input)`
+
+`getServerSideProps` intentionally does not expose `ctx.db` or `ctx.cache`.
+Business reads/writes should stay in Func code, then be called from SSR through
+`ctx.func.invoke`. If SSR reads cookies, auth, or invokes Func, the render
+runtime treats the response as private/no-store unless a future platform cache
+variant mechanism says otherwise.
 
 ## Agent Checklist
 
