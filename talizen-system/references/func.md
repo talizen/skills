@@ -254,21 +254,17 @@ Rules for page code:
 - Do not include `project_id`, `site_id`, internal tokens, or table IDs in the
   client payload.
 
-## Calling Func From getServerSideProps
+## Func and getServerSideProps
 
-Do not import `talizen/func` inside `getServerSideProps`. Server-side page code
-receives a request context and must use `ctx.func.invoke(...)`:
+Do not call Func from `getServerSideProps`. Server-side page code receives a
+small request context, but it does not expose `ctx.auth`, `ctx.func`, `ctx.db`,
+or `ctx.cache`. Keep Func calls in browser-side interactions or API-style flows.
 
 ```ts
 import type { TalizenServerSideContext } from "talizen/server-runtime"
 
 export async function getServerSideProps(ctx: TalizenServerSideContext) {
-  const user = ctx.auth.currentUser()
-  const data = ctx.func.invoke("contact.privateData", {
-    path: ctx.request.path
-  })
-
-  return { props: { user, data } }
+  return { props: { path: ctx.request.path } }
 }
 ```
 
@@ -280,22 +276,16 @@ Available `getServerSideProps` context helpers:
 - `ctx.cookies.get(name)`
 - `ctx.cookies.set(name, value, options?)`
 - `ctx.cookies.delete(name, options?)`
-- `ctx.auth.currentUser()`
-- `ctx.auth.requireUser()`
-- `ctx.func.invoke("file.method", input)`
 
-`getServerSideProps` intentionally does not expose `ctx.db` or `ctx.cache`.
-Business reads/writes should stay in Func code, then be called from SSR through
-`ctx.func.invoke`.
+`getServerSideProps` intentionally does not expose `ctx.auth`, `ctx.func`,
+`ctx.db`, or `ctx.cache`. Business reads/writes should stay in Func code and be
+called from browser-side code via `talizen/func`.
 
 Render cache behavior:
 
-- `ctx.cookies.*` and `ctx.auth.*` make the SSR response private/no-store.
-- `ctx.func.invoke(...)` can stay cacheable when the Func only reads JSON-table
-  data through `ctx.db.get/query`; the Func returns table/record dependencies to
-  render, and JSON-table updates invalidate the dependent HTML cache.
-- Func code that reads `ctx.cache`, reads cookies/auth, sets cookies, or writes
-  data through `ctx.db.insert/update/delete` makes the SSR response no-store.
+- `ctx.cookies.*` makes the SSR response private/no-store.
+- Func is deliberately unavailable in SSR so arbitrary db/cache/auth/cookie
+  logic cannot make HTML caching unpredictable.
 
 ## Agent Checklist
 
