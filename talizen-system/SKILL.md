@@ -139,7 +139,7 @@ The end user of the Talizen AI assistant is typically non-technical:
 - `references/auth.md` for platform auth, password login/register, current user,
   logout, OAuth/social login providers, and protected UI patterns
 - `references/func.md` for project-level Func code, JSON-table access,
-  multi-method files, platform auth usage, and client-side
+  Func-generated asset uploads, multi-method files, platform auth usage, and client-side
   `invoke("file.method")` calls
 - `references/seo.md` for metadata fields and SEO migration
 - `references/css.md` for Tailwind v4 component styling and site CSS conventions
