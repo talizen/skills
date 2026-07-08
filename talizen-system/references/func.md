@@ -81,6 +81,8 @@ Rules:
    `{ ok: false, code: "slot_taken" }` instead of throwing.
 9. Throw only for unexpected failures or invalid requests that should surface as
    errors.
+10. Do not hard-code API keys, bearer tokens, passwords, webhook secrets, or
+    service credentials in Func source.
 
 Preferred type import:
 
@@ -128,6 +130,27 @@ For browser visitor identity, use `ctx.auth.currentUser()` or
 Redis helpers may exist behind the same Func runtime, but only use them after
 the project confirms Redis proxy support is enabled. For ordinary booking and
 lead flows, prefer `ctx.db.*`.
+
+## Secrets And Environment Variables
+
+Keep secrets out of source files. If a Func needs a third-party API key or other
+secret, read it from `process.env.NAME`:
+
+```ts
+export async function generate(input, ctx) {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    return { ok: false, code: "missing_openai_token", message: "OPENAI_API_KEY is not configured." }
+  }
+  // Use apiKey only inside server-side Func code.
+}
+```
+
+The env value itself must be added manually in the Creght platform Backend / Env
+panel at `panel/backend/env` for the project. Do not put a real value in
+`talizen.config.ts`, `backend/func/*.ts`, page/component code, examples,
+comments, or generated test fixtures. Env values must be configured manually in
+the platform; do not attempt or claim agent/tool env management.
 
 ## Assets In Func
 
@@ -318,8 +341,10 @@ Before building a Func-backed feature:
    expose table management.
 3. Create a project-level Func with an extensionless key.
 4. Export one method per operation.
-5. Call the method with `invoke("key.method", input)` from the page.
-6. Run lint after editing page/component code.
+5. If the Func needs secrets, read `process.env.NAME` and tell the user to add
+   the env value manually in Creght Backend / Env at `panel/backend/env`.
+6. Call the method with `invoke("key.method", input)` from the page.
+7. Run lint after editing page/component code.
 
 For a simple appointment workflow, the normal shape is:
 
