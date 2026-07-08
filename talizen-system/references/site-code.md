@@ -139,6 +139,10 @@ Rules:
   and `import source from "./file.ext?raw"` returns the original file contents as
   a string. Use these for worker source, WASM/worker helper scripts, and other
   local assets that need URL or raw-string semantics.
+- For assets generated at runtime inside Func, such as AI-generated images, use
+  `ctx.assets.upload({ filename, mimeType, base64 })` from the Func and store
+  only the returned URL/path/size metadata. Do not store base64 payloads in JSON
+  tables or return them from list endpoints.
 
 Example:
 

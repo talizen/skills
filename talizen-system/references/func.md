@@ -101,6 +101,7 @@ Available helpers:
 - `ctx.db.delete(tableKey, id)`
 - `ctx.auth.currentUser()`
 - `ctx.auth.requireUser()`
+- `ctx.assets.upload({ filename, mimeType, base64 })`
 - `ctx.cache.get(key)`
 - `ctx.cache.set(key, value, ttlSeconds)`
 - `ctx.cache.del(key)`
@@ -127,6 +128,27 @@ For browser visitor identity, use `ctx.auth.currentUser()` or
 Redis helpers may exist behind the same Func runtime, but only use them after
 the project confirms Redis proxy support is enabled. For ordinary booking and
 lead flows, prefer `ctx.db.*`.
+
+## Assets In Func
+
+Use `ctx.assets.upload({ filename, mimeType, base64 })` when a Func creates a
+large binary asset at runtime, such as an AI-generated image. It uploads the
+asset to the project's hosted asset storage/CDN and returns:
+
+```ts
+{
+  fileUrl: "https://...",
+  filePath: "project/...",
+  size: 123456
+}
+```
+
+Store `fileUrl`, `filePath`, `size`, and other metadata in JSON tables. Do not
+store base64 image/video/audio payloads in `ctx.db` records and do not return
+large base64 payloads from Func methods; Func results have a bounded response
+size and community/list endpoints should stay lightweight. Local build-time
+assets are different: use the page compiler's `?url` / `?raw` imports for
+files that already exist in the site source.
 
 ## Auth In Func
 
