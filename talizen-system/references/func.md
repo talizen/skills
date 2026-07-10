@@ -64,7 +64,7 @@ closely related operations, put multiple exported methods in one Func file.
 ## Writing Func Code
 
 Func code can be authored as TypeScript. The platform compiles it with esbuild
-and runs it in a synchronous JavaScript runtime.
+and runs it in the Func runtime.
 
 Rules:
 
@@ -72,17 +72,18 @@ Rules:
 2. Use `export function main(input, ctx)` for the default method.
 3. Put all platform runtime access behind `ctx`.
 4. Import only TypeScript types from `talizen/func-runtime` when needed.
-5. Do not use `async`, `await`, or `Promise` unless the platform explicitly
-   adds async completion support.
-6. Do not write a manual `main` dispatcher. Export each callable method
+5. Do not write a manual `main` dispatcher. Export each callable method
    directly.
-7. Validate and normalize all input inside the Func.
-8. Return structured JSON. Use expected business results such as
-   `{ ok: false, code: "slot_taken" }` instead of throwing.
-9. Throw only for unexpected failures or invalid requests that should surface as
+6. Validate and normalize all input inside the Func.
+7. Return structured JSON. Use expected business results such as
+   `{ status: "slot_taken", message: "This time is unavailable." }` instead of
+   throwing.
+8. Throw only for unexpected failures or invalid requests that should surface as
    errors.
-10. Do not hard-code API keys, bearer tokens, passwords, webhook secrets, or
+9. Do not hard-code API keys, bearer tokens, passwords, webhook secrets, or
     service credentials in Func source.
+10. Methods may be `async` when they need request body readers, `fetch`, or
+    other Promise-returning runtime APIs.
 
 Preferred type import:
 
@@ -112,6 +113,11 @@ Available helpers:
 - `ctx.request.host`, `ctx.request.ip`, `ctx.request.method`, `ctx.request.path`
 - `ctx.request.headers.get(name)`
 - `ctx.request.cookies.get(name)`
+- `ctx.request.bodyUsed`
+- `ctx.request.text()`
+- `ctx.request.json()`
+- `ctx.request.arrayBuffer()`
+- `ctx.response.status(code)`
 - `ctx.cookies.get(name)`
 - `ctx.cookies.set(name, value, options?)`
 - `ctx.cookies.delete(name, options?)`
@@ -121,6 +127,25 @@ Available helpers:
 Do not use legacy globals such as `data`, `db`, `auth`, or `cache`. Do not use
 CommonJS exports such as `exports.method = ...` or `module.exports`. New Func
 code must use ESM exports and the `(input, ctx)` signature.
+
+The request body readers follow Fetch `Request` semantics: they return Promises
+and the body can be consumed only once. For webhook signatures, prefer
+`await ctx.request.arrayBuffer()` so the exact incoming bytes are verified.
+The runtime provides `TextEncoder` and the HMAC SHA-256 subset of
+`crypto.subtle.importKey/sign/verify` for Stripe, Creem, and similar webhook
+verification flows.
+
+`ctx.response.status(code)` sets the real HTTP response status for the Func
+request. It accepts statuses from 100 through 599 and remains effective when a
+Func sets it and then throws, which is useful for Webhook retry responses.
+
+Func HTTP responses use status codes and do not include a top-level execution
+`ok` field. A successful direct HTTP call returns `{ "result": ... }`; a thrown
+Func error returns `{ "error": "..." }`. The browser-side `invoke()` helper
+unwraps successful responses and returns the `result` value directly. If a Func
+does `return { id: "evt_123" }`, the public HTTP response is
+`{ "result": { "id": "evt_123" } }`, while `await invoke(...)` resolves to
+`{ id: "evt_123" }`.
 
 `ctx.project_id`, `ctx.site_id`, and platform user IDs are intentionally not
 visible to Func code. The platform uses them internally for project isolation.
@@ -140,7 +165,7 @@ secret, read it from `process.env.NAME`:
 export async function generate(input, ctx) {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
-    return { ok: false, code: "missing_openai_token", message: "OPENAI_API_KEY is not configured." }
+    return { status: "missing_openai_token", message: "OPENAI_API_KEY is not configured." }
   }
   // Use apiKey only inside server-side Func code.
 }
@@ -234,7 +259,7 @@ export function create(input, ctx) {
     limit: 1
   })
   if (existing.length > 0) {
-    return { ok: false, code: "slot_taken", message: "This time is unavailable." }
+    return { status: "slot_taken", message: "This time is unavailable." }
   }
 
   const inserted = ctx.db.insert("appointments", {
@@ -245,7 +270,7 @@ export function create(input, ctx) {
     status: "confirmed",
     createdAt: new Date().toISOString()
   })
-  return { ok: true, id: inserted.id }
+  return { id: inserted.id }
 }
 ```
 
@@ -267,8 +292,8 @@ Common client-side call:
 import { invoke, TalizenFuncError } from "talizen/func"
 
 type BookingResult =
-  | { ok: true; id: string }
-  | { ok: false; code: "slot_taken"; message: string }
+  | { id: string }
+  | { status: "slot_taken"; message: string }
 
 try {
   const result = await invoke<BookingResult>("booking.create", {
@@ -277,7 +302,7 @@ try {
     date,
     time
   })
-  if (!result.ok) {
+  if ("status" in result) {
     setMessage(result.message)
     return
   }
@@ -294,7 +319,7 @@ Rules for page code:
 - Import Func client helpers from `talizen/func`, not from a relative SDK path.
 - Use `invoke("file.method", input)` for normal use.
 - Use `invoke("file", input)` only when the Func exports `main`.
-- Handle expected `{ ok: false, code, message }` business responses separately
+- Handle expected `{ status, message }` business responses separately
   from thrown errors.
 - Do not include `project_id`, `site_id`, internal tokens, or table IDs in the
   client payload.
