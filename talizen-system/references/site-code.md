@@ -48,6 +48,12 @@ Prefer `getServerSideProps(context)` for route params and first-render data.
 Read dynamic params from `context.params`; do not use client-side param hooks
 when SSR params are available.
 
+Do not read auth state in `getServerSideProps`. The render runtime deliberately
+does not expose `context.auth` because HTML caching relies on explicit
+dependencies and cookie-vary names; hidden user-specific auth reads would make
+cache safety unpredictable. Use `useAuth()` in React UI, or Func `ctx.auth` for
+protected backend actions.
+
 Example:
 
 ```tsx
