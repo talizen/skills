@@ -122,6 +122,36 @@ Guidelines:
 - Place Open Graph data under `metadata.openGraph`.
 - Use absolute URLs for Open Graph images, videos, and audio.
 
+## Viewport
+
+Viewport is configured separately from `metadata`, at the site level only:
+
+```ts
+export default {
+  viewport: {
+    width: 1200,
+    initialScale: null,
+    maximumScale: 1,
+    userScalable: false,
+    interactiveWidget: "resizes-visual",
+    themeColor: "#111111",
+    colorScheme: "dark",
+  },
+}
+```
+
+Default output when omitted:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
+
+Do not use `metadata.viewport`; do not add raw viewport tags in
+`customCode.head`. Supported fields: `width`, `height`, `initialScale`,
+`minimumScale`, `maximumScale`, `userScalable`, `interactiveWidget`,
+`themeColor`, and `colorScheme`. Use `initialScale: null` to remove the default
+`initial-scale=1`. Page-level `viewport` / `generateViewport` is not supported.
+
 ## Page-Level Metadata (PAGE.tsx / Page.tsx)
 
 Each page can export its own `metadata` object, or export `generateMetadata` for dynamic values. Both participate in merge rules with the site-level metadata. Prefer `generateMetadata` when page SEO depends on route params or query data.
