@@ -20,7 +20,7 @@ Create the file at the project root:
 /sitemap.ts
 ```
 
-Do not place sitemap files under `/page` or `/app`. Sitemap generation is site-level
+Do not place sitemap files under `/pages` or `/app`. Sitemap generation is site-level
 configuration, not a route component.
 
 ## Return Shape

@@ -2,14 +2,14 @@
 name: talizen
 description: >
   Guidance for Talizen platform apps. Read this skill before editing project files
-  or giving Talizen-specific advice (talizen.config.ts, /page routes, CMS/form/Func, Tailwind v4,
+  or giving Talizen-specific advice (talizen.config.ts, /pages routes, CMS/form/Func, Tailwind v4,
   SEO/metadata, importMap, platform tools). Examples: "Build a website for a coffee shop",
   "Create an About page", "Optimize SEO", "Add a carousel", Not required for greetings or non-project chat.
 ---
 
 # Talizen
 
-Talizen apps are React-based websites with file-based routes under `/page`, a
+Talizen apps are React-based websites with file-based routes under `/pages`, a
 root `talizen.config.ts`, Tailwind v4 styling, and platform APIs for CMS, forms,
 Func, metadata, import maps, linting, previews, and versioning.
 
@@ -21,8 +21,8 @@ Use the `references/*.md` files for detailed guidance on each topic.
 - Talizen is not a standard browser SPA or Next.js app. Do not introduce
   `react-router-dom`, `next/link`, `next/router`, `next/navigation`,
   `getStaticProps`, or `getStaticPaths`.
-- Pages live in `/page` as `.tsx` React components. Keep reusable UI in
-  `/component` or another shared components directory.
+- Pages live in `/pages` as `.tsx` React components. Keep reusable UI in
+  `/components` or another shared components directory.
 - Use native anchors `<a href="/about">...</a>` for navigation, or — for internal
   links in a multilingual site — talizen's locale-aware `<Link>`
   (`import { Link } from "talizen"`, v0.2.0+), which auto-prefixes the current
@@ -95,12 +95,12 @@ before checking the relevant guidance.
    imports, SEO, custom code, or site-level styling may be involved.
 2. If the project contains `AGENTS.md`, read it before editing and follow it as
    primary local guidance.
-3. Inspect the relevant page/component/schema files before changing code.
+3. Inspect the relevant pages/components/schema files before changing code.
 4. Before modifying files in the Talizen AI assistant, create a version with
    `create_version` so the change can be rolled back.
 5. Apply focused edits, preferably with `diff_patch_file` in the Talizen AI
    assistant.
-6. Run `lint` whenever page or component code changed.
+6. Run `lint` whenever pages or components code changed.
 7. If lint, typecheck, build, preview, browser rendering, or runtime validation
    reports any error, follow `references/error-handling.md` immediately before
    any fix action. Apply its retry limits and known non-fixable cases.
