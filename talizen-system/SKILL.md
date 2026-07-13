@@ -45,13 +45,16 @@ Use the `references/*.md` files for detailed guidance on each topic.
 - Use relative paths for local project imports. The Talizen platform does not
   support alias imports such as `@/lib/utils`; write them as relative imports
   like `../lib/utils` or `./lib/utils` from the importing file.
-- Media assets are CDN resources, not editable project files. Do not create,
-  copy, import, or reference images, PDFs, videos, fonts, or other binary assets
-  as local site files. Page/component code must use complete CDN URLs returned
-  by the platform asset tools or supplied by the user; do not use relative paths
-  for media assets. If a needed asset has no CDN URL, stop and ask for one or
-  use `upload_attachment`; do not guess, synthesize, or write a local fallback
-  path.
+- Media assets (images, PDFs, videos, fonts, other binaries) are hosted
+  resources, not editable project files. Reference each by a complete absolute
+  URL — the platform CDN, a user-supplied URL, an external/third-party host
+  (hotlinking is allowed), or a `data:` URI for tiny inline assets are all fine.
+  Do NOT commit or import binaries as local site files, reference them by
+  relative or local paths, or guess/synthesize a fallback path. Prefer the
+  platform CDN for anything you ship — external hotlinks can rot, be slow, or
+  get blocked — so when you have a local binary that must ship, or want to
+  stabilize a hotlink before publish, upload it via `upload_attachment` (which
+  returns a CDN URL) instead of committing the file.
 - Use `metadata` for SEO instead of custom `seo` fields or raw `<title>` /
   `<meta name="description">` tags.
 - For simple backend workflows such as booking, RSVP, lead capture, availability
