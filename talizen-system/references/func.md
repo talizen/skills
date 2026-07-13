@@ -35,7 +35,7 @@ Do not use Func for:
 
 For login, registration, logout, current user, OAuth/social login, and account
 UI, read `references/auth.md` and use the browser-side `talizen/auth`
-`useAuth()` hook from page/component code.
+`useAuth()` hook from pages/components code.
 
 ## Func Keys And Methods
 
@@ -184,7 +184,7 @@ export async function generate(input, ctx) {
 
 The env value itself must be added manually in the Creght platform Backend / Env
 panel at `panel/backend/env` for the project. Do not put a real value in
-`talizen.config.ts`, `backend/func/*.ts`, page/component code, examples,
+`talizen.config.ts`, `backend/func/*.ts`, pages/components code, examples,
 comments, or generated test fixtures. Env values must be configured manually in
 the platform; do not attempt or claim agent/tool env management.
 
@@ -301,7 +301,7 @@ Expected table key: `appointments`. Its JSON Schema should include at least
 
 ## Calling Func From A Page
 
-Use the SDK exported by `talizen/func` for browser-side page/component
+Use the SDK exported by `talizen/func` for browser-side pages/components
 interactions. For exact declarations, fetch package types only when needed:
 
 ```ts
@@ -395,7 +395,7 @@ Before building a Func-backed feature:
 5. If the Func needs secrets, read `process.env.NAME` and tell the user to add
    the env value manually in Creght Backend / Env at `panel/backend/env`.
 6. Call the method with `invoke("key.method", input)` from the page.
-7. Run lint after editing page/component code.
+7. Run lint after editing pages/components code.
 
 For a simple appointment workflow, the normal shape is:
 
