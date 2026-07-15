@@ -168,5 +168,7 @@ The end user of the Talizen AI assistant is typically non-technical:
 - `references/css.md` for Tailwind v4 component styling and site CSS conventions
 - `references/carousel.md` for carousel/slideshow setup
 - `references/sitemap.md` for root-level sitemap generation
+- `references/analytics.md` for automatic visit analytics and custom event
+  tracking (`data-track` attributes and `window.creght.track`)
 - `references/error-handling.md` for bounded lint, typecheck, build, preview,
   browser, runtime, and external-resource error handling
