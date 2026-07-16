@@ -1,3 +1,4 @@
 interface:
   display_name: "Talizen"
-  short_description: "Help with Talizen tasks and workflows"
+  short_description: "Build Talizen sites and guide Creght editor operations"
+  default_prompt: "Use $talizen to help with this Talizen site or Creght editor task."

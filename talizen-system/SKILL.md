@@ -1,10 +1,11 @@
 ---
 name: talizen
 description: >
-  Guidance for Talizen platform apps. Read this skill before editing project files
-  or giving Talizen-specific advice (talizen.config.ts, /pages routes, CMS/form/Func, Tailwind v4,
-  SEO/metadata, importMap, platform tools). Examples: "Build a website for a coffee shop",
-  "Create an About page", "Optimize SEO", "Add a carousel", Not required for greetings or non-project chat.
+  Guidance for Talizen platform apps and Creght editor operations. Use before
+  editing project files or giving platform-specific advice about /pages routes,
+  talizen.config.ts, CMS/form/Func, Auth, Tailwind v4, SEO/metadata, importMap,
+  domains, DNS/SSL, publishing, website analytics, environment variables, or
+  other platform tools. Not required for greetings or unrelated chat.
 ---
 
 # Talizen
@@ -77,11 +78,6 @@ Use the `references/*.md` files for detailed guidance on each topic.
   before building login, signup, account, OAuth, or protected UI flows.
 - Before using `talizen/auth`, read the type definitions from the `talizen`
   version used by the current project and follow those request/response models.
-- When encountering `LINT_ERROR`, `BROWSER_ERROR_RENDER`, or any build/runtime
-  error, the first response must be to follow `references/error-handling.md`.
-  Do not make speculative code changes before checking its retry limits and
-  known non-fixable cases.
-
 ## Error Trigger
 
 When tool output contains `LINT_ERROR`, `BROWSER_ERROR_RENDER`, a build failure,
@@ -106,6 +102,23 @@ before checking the relevant guidance.
    any fix action. Apply its retry limits and known non-fixable cases.
 8. After successful edits, create one final version with `create_version`. A task
    should create at most two versions: before and after the change.
+
+## Focused Exceptions
+
+- For copy-only edits, edit the relevant strings directly and run lint. Skill
+  reference loading and version creation may be skipped.
+- Use screenshots only when the user requests visual reference from another
+  website or reports a visual problem with the current site. Otherwise inspect
+  source code first.
+
+## Question-Only Tasks
+
+When the user asks how to use the Creght/Talizen editor or where to find a
+platform feature, answer directly without creating versions, editing files, or
+running lint. Read `references/console-operations.md` for domains, DNS/SSL,
+publishing, analytics, environment variables, members, plans, and other editor
+navigation questions. If the user asks to implement custom event tracking, also
+read `references/analytics.md`.
 
 ## Backend Capability Patterns
 
@@ -170,5 +183,7 @@ The end user of the Talizen AI assistant is typically non-technical:
 - `references/sitemap.md` for root-level sitemap generation
 - `references/analytics.md` for automatic visit analytics and custom event
   tracking (`data-track` attributes and `window.creght.track`)
+- `references/console-operations.md` for question-only guidance about domains,
+  DNS/SSL, publishing, analytics, environment variables, members, and plans
 - `references/error-handling.md` for bounded lint, typecheck, build, preview,
   browser, runtime, and external-resource error handling

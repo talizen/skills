@@ -14,6 +14,13 @@ context, so user code must not receive, hard-code, read, or branch on
 `project_id`. A site may call a Func through its own domain, but the Func and
 its JSON data belong to the project.
 
+## Agent Workspace
+
+Func source files live under `/backend/func`. For example,
+`/backend/func/booking.ts` maps to Func key `booking`. Create, update, rename,
+or delete Func code by editing files in this directory. Use `run_func` only to
+self-test a Func method with sample input.
+
 ## When To Use Func
 
 Use Func when the user asks for behavior such as:
@@ -305,7 +312,7 @@ Use the SDK exported by `talizen/func` for browser-side pages/components
 interactions. For exact declarations, fetch package types only when needed:
 
 ```ts
-fetch_module_types("talizen")
+fetch_module_types("talizen/func")
 ```
 
 Common client-side call:
