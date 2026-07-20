@@ -47,8 +47,8 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 2. Read local project guidance such as `AGENTS.md` if present.
 3. Read `talizen.config.ts` when imports, metadata, custom code, or site-level
    styling may be involved.
-4. Inspect the relevant `/page`, `/component`, `/types`, and root config files
-   before editing.
+4. Inspect the relevant page/component files, `/types`, and root config files;
+   follow the project's existing root convention.
 5. Apply focused changes that match existing project conventions.
 6. Validate with available local checks or Talizen platform checks. If no local
    renderer exists, use `talizen push`, `talizen sync`, or `talizen preview` as
@@ -67,8 +67,9 @@ checking the relevant guidance.
 
 ## Hard Platform Rules
 
-- Pages live in `/page` as `.tsx` React components.
-- Keep reusable UI in `/component` or another shared components directory.
+- Use the project's existing `/pages` or `/page` route root and `/components`
+  or `/component` UI root; do not rename or mix them. Prefer the plural names
+  for new projects.
 - Do not introduce `react-router-dom`, `next/link`, `next/router`,
   `next/navigation`, `getStaticProps`, or `getStaticPaths`.
 - Use native anchors such as `<a href="/about">...</a>` for navigation. On a

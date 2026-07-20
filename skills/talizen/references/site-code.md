@@ -1,21 +1,25 @@
 # Talizen Site Code
 
-Talizen apps are React-based websites with file-based routes under `/page`, a
-root `talizen.config.ts`, Tailwind v4 styling, generated project types, and
-platform APIs for CMS, forms, metadata, import maps, previews, and publishing.
+Talizen apps are React-based websites with file-based routes under `/pages` or
+`/page`, a root `talizen.config.ts`, Tailwind v4 styling, generated project
+types, and platform APIs for CMS, forms, metadata, import maps, previews, and
+publishing.
+
+Both singular and plural page/component roots work. Keep the project's existing
+roots; for new projects, prefer `/pages` and `/components`. Examples use plural.
 
 ## Routing
 
-Routing is derived from `/page` file names by Talizen conventions:
+Routing is derived from file names in the project's page root:
 
-- `/page/Index.tsx` -> `/`
-- `/page/About.tsx` -> `/about`
+- `/pages/Index.tsx` -> `/`
+- `/pages/About.tsx` -> `/about`
 
 For non-`Index` pages, do not guess kebab-case routes. Prefer the lowercase
 canonical path returned by lint or platform validation; for example,
-`/page/BlockElementsPage.tsx` should be linked as `/blockelementspage`.
+`/pages/BlockElementsPage.tsx` should be linked as `/blockelementspage`.
 
-Files like `/page/XXXX.canvas.tsx` are canvas preview entries used by the
+Files like `/pages/XXXX.canvas.tsx` are canvas preview entries used by the
 platform editor, not normal route files to generate by hand.
 
 For localized routing (locale prefixes and per-locale page files), see
@@ -62,9 +66,8 @@ export async function getServerSideProps(context) {
 
 ## Components
 
-Keep page files focused on route-level composition. Put reusable UI in
-`/component` or another shared components directory that already exists in the
-project.
+Keep page files focused on route-level composition. Put reusable UI in the
+project's existing component root or another shared components directory.
 
 If the user asks only for a component but also wants a preview, make the
 component visible in a page whenever possible. A standalone component cannot
