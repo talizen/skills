@@ -2,7 +2,7 @@
 name: talizen
 description: >
   Guidance for Talizen platform apps and Creght editor operations. Use before
-  editing project files or giving platform-specific advice about /pages routes,
+  editing project files or giving platform-specific advice about /pages or /page routes,
   talizen.config.ts, CMS/form/Func, Auth, Tailwind v4, SEO/metadata, importMap,
   domains, DNS/SSL, publishing, website analytics, environment variables, or
   other platform tools. Not required for greetings or unrelated chat.
@@ -10,9 +10,9 @@ description: >
 
 # Talizen
 
-Talizen apps are React-based websites with file-based routes under `/pages`, a
-root `talizen.config.ts`, Tailwind v4 styling, and platform APIs for CMS, forms,
-Func, metadata, import maps, linting, previews, and versioning.
+Talizen apps are React-based websites with file-based routes under `/pages` or
+`/page`, a root `talizen.config.ts`, Tailwind v4 styling, and platform APIs for
+CMS, forms, Func, metadata, import maps, linting, previews, and versioning.
 
 Use this file for the non-negotiable platform rules and the default workflow.
 Use the `references/*.md` files for detailed guidance on each topic.
@@ -22,8 +22,9 @@ Use the `references/*.md` files for detailed guidance on each topic.
 - Talizen is not a standard browser SPA or Next.js app. Do not introduce
   `react-router-dom`, `next/link`, `next/router`, `next/navigation`,
   `getStaticProps`, or `getStaticPaths`.
-- Pages live in `/pages` as `.tsx` React components. Keep reusable UI in
-  `/components` or another shared components directory.
+- Use the project's existing `/pages` or `/page` route root and `/components`
+  or `/component` UI root; do not rename or mix them. Prefer the plural names
+  for new projects.
 - Use native anchors `<a href="/about">...</a>` for navigation, or — for internal
   links in a multilingual site — talizen's locale-aware `<Link>`
   (`import { Link } from "talizen"`, v0.2.0+), which auto-prefixes the current
@@ -91,7 +92,8 @@ before checking the relevant guidance.
    imports, SEO, custom code, or site-level styling may be involved.
 2. If the project contains `AGENTS.md`, read it before editing and follow it as
    primary local guidance.
-3. Inspect the relevant pages/components/schema files before changing code.
+3. Inspect the relevant page/component files and follow the project's existing
+   root convention.
 4. Before modifying files in the Talizen AI assistant, create a version with
    `create_version` so the change can be rolled back.
 5. Apply focused edits, preferably with `diff_patch_file` in the Talizen AI
