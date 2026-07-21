@@ -209,3 +209,4 @@ Common return shape:
   merge `_i18n` yourself. See `references/i18n.md`.
 - Do not rely on old helper names from legacy docs.
 - When updating and creating content, follow the jsonSchema definition of the cms collection
+- For Markdown body fields, prefer `type: "string"` with `contentMediaType: "text/markdown"` because Creght's visual editor can recognize it and render the proper Markdown editing control; it also recognizes `text/html` as rich text HTML, `image/*` as image URL/upload fields, `video/*` as video URL/upload fields, and other `contentMediaType` values as generic file fields.
