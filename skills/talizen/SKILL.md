@@ -10,111 +10,74 @@ description: >
 
 # Talizen
 
-Talizen sites are React-based websites rendered by the Talizen platform. Local
-agents usually work by using the Talizen CLI to pull site files, editing those
-files locally, then pushing, syncing, or previewing through Talizen.
-
-This skill is for general-purpose agents. Do not assume Talizen-system-only
-tools are available. If the current environment exposes Talizen tools such as
-linting, schema creation, module type fetching, versioning, or patch helpers,
-use them when appropriate; otherwise inspect local files and use the CLI.
+Talizen sites are React websites rendered by the Talizen platform. General
+agents usually use the Talizen CLI to pull site files, edit locally, then push,
+sync, or preview through Talizen. Do not assume Talizen-system-only tools are
+available; use them if exposed, otherwise inspect files and use the CLI.
 
 ## Core Model
 
-- The CLI handles login, project creation and discovery, pull, push, sync,
-  preview, and publish workflows, plus platform data and asset operations.
+- The CLI handles login, project/site discovery, pull, push, sync, preview,
+  publish, platform data, and asset operations.
 - `pull` downloads remote site files into a local directory.
-- `push` uploads the current local directory snapshot to Talizen and exits.
-- `sync` is watch mode: it pushes the current local snapshot, then keeps
-  listening for local file changes and pushes them in realtime.
-- The CLI does not render sites locally.
-- Rendering, CMS, assets, realtime preview, and publication are handled by the
-  Talizen backend and web app.
-- Site code must follow Talizen platform rules; do not treat a Talizen site as a
-  generic Vite, Next.js, or browser SPA project.
-- If the user's message does not contain an actionable requirement, such as only
-  attaching an image without instructions, do not create or modify a website.
-  Ask the user what they want to build or change.
-- The Talizen platform does not yet support authenticated backend data
-  operations, such as user login and registration. This capability is still
-  under development. If users need similar functionality, implement only the
-  frontend portion and clearly remind them that authenticated backend behavior is
-  not available yet.
+- `push` uploads the current local snapshot and exits.
+- `sync` pushes once, then watches local changes and pushes in realtime.
+- The CLI does not render sites locally; rendering, CMS, assets, preview, and
+  publication are backend/web-app responsibilities.
+- Site code must follow Talizen platform rules; do not treat it as generic Vite,
+  Next.js, or browser SPA code.
+- If the user provides no actionable requirement, ask what to build or change.
+- Authenticated backend data operations such as login/registration are not yet
+  supported. If requested, implement only frontend UI and state the backend
+  limitation clearly.
 
 ## Default Workflow
 
-1. Locate the site directory. If it is not local yet, use the CLI pull workflow.
-2. Read local project guidance such as `AGENTS.md` if present.
+1. Locate the site directory. Pull with the CLI if it is not local.
+2. Read local `AGENTS.md` if present.
 3. Read `talizen.config.ts` when imports, metadata, custom code, or site-level
-   styling may be involved.
-4. Inspect the relevant page/component files, `/types`, and root config files;
-   follow the project's existing root convention.
-5. Apply focused changes that match existing project conventions.
-6. Validate with available local checks or Talizen platform checks. If no local
-   renderer exists, use `talizen push`, `talizen sync`, or `talizen preview` as
-   the verification path. Use `talizen push` for a one-time upload and
-   `talizen sync` when you want watch mode.
-7. If lint, typecheck, build, preview, browser rendering, or runtime validation
-   reports any error, read `references/error-handling.md` immediately before any
-   fix action. Follow its retry limits and known non-fixable cases.
-
-## Error Trigger
-
-When a typecheck, build, or lint/validate command fails, or the user reports a
-runtime or browser error, immediately activate the error-handling protocol by
-reading `references/error-handling.md`. Do not perform speculative fixes before
-checking the relevant guidance.
+   CSS may be involved.
+4. Inspect relevant page/component files, `/types`, and root configs.
+5. Apply focused edits that preserve local conventions.
+6. Validate with available local checks or platform checks. Without a local
+   renderer, use `talizen push`, `talizen sync`, or `talizen preview`.
+7. On lint, typecheck, build, preview, browser, or runtime errors, immediately
+   read `references/error-handling.md` before fixing.
 
 ## Hard Platform Rules
 
-- Use the project's existing `/pages` or `/page` route root and `/components`
-  or `/component` UI root; do not rename or mix them. Prefer the plural names
-  for new projects.
-- Do not introduce `react-router-dom`, `next/link`, `next/router`,
+- Preserve existing `/pages` or `/page` route root and `/components` or
+  `/component` UI root. Prefer plural roots only for new projects.
+- Do not add `react-router-dom`, `next/link`, `next/router`,
   `next/navigation`, `getStaticProps`, or `getStaticPaths`.
-- Use native anchors such as `<a href="/about">...</a>` for navigation. On a
-  multilingual site, use talizen's locale-aware `<Link>`
-  (`import { Link } from "talizen"`, v0.2.0+) for internal links — it
-  auto-prefixes the current locale (a plain `<a>` drops the visitor out of their
-  language). talizen's own `<Link>` is allowed; do not use `next/link`,
-  `next/router`, `next/navigation`, or other router libraries.
-- Prefer `getServerSideProps(context)` for route params and first-render data.
-- Read route params from `context.params` when SSR params are available.
-- Do not proactively create `*.canvas.ts` or `*.canvas.tsx` files. They are
-  platform editor preview entries. Edit existing canvas files only when the user
-  explicitly asks.
-- Use Tailwind v4 utility classes for component styling. Avoid inline `style`
-  props and ad-hoc `<style>` tags in page components.
-- Use relative paths for local project imports. The Talizen platform does not
-  support alias imports such as `@/lib/utils`; write them as relative imports
-  like `../lib/utils` or `./lib/utils` from the importing file.
-- Use structured `metadata` for SEO instead of custom `seo` fields or raw
-  `<title>` / `<meta name="description">` tags.
-- Do not implement authenticated backend data operations such as user login or
-  registration yet; the Talizen platform does not support them. If users need
-  similar functionality, implement only the frontend portion and clearly remind
-  them that authenticated backend behavior is not available yet.
-- When a typecheck, build, lint/validate, or user-reported runtime or browser
-  error occurs, the first response must be to read and follow
-  `references/error-handling.md`. Do not make speculative code changes before
-  checking that guidance.
+- Use native anchors for navigation. On multilingual sites, use Talizen's
+  locale-aware `<Link>`; never use router libraries.
+- Use `getServerSideProps(context)` for route params and first-render data.
+  Read route params from `context.params`.
+- Do not create `*.canvas.ts(x)` files unless explicitly asked.
+- Prefer Tailwind v4 utilities. Avoid inline `style` and ad-hoc page `<style>`
+  blocks.
+- Use relative imports for local files; aliases such as `@/lib/utils` are
+  unsupported.
+- Use structured `metadata`, not custom `seo` fields or duplicate raw SEO tags.
+- Do not implement authenticated backend data operations yet.
+- On validation/runtime errors, read `references/error-handling.md` before
+  speculative code changes.
 
-## Reference Map
+## Reference Routing
 
-- `references/cli.md`: CLI install/use, endpoint defaults, platform data
-  commands, and asset upload commands.
-- `references/site-code.md`: routing, page/component structure, import maps,
-  and config rules.
-- `references/cms.md`: CMS data fetching and generated schema usage.
-- `references/forms.md`: form submissions and payload typing.
-- `references/seo.md`: site and page metadata.
-- `references/i18n.md`: multilingual sites — locale routing, reading the
-  locale, `_i18n` content storage, and `/messages` UI text.
-- `references/css.md`: Tailwind v4 and `index.css` conventions.
-- `references/sitemap.md`: root-level sitemap generation.
-- `references/carousel.md`: carousel/slideshow default approach.
-- `references/error-handling.md`: bounded handling for lint, typecheck, build,
-  preview, browser, runtime, and external-resource errors.
+- `references/cli.md`: CLI install/use, endpoint defaults, platform data,
+  publish, and asset upload.
+- `references/site-code.md`: routes, pages/components, SSR, imports, import
+  maps, `talizen.config.ts`, redirects, package types.
+- `references/css.md`: Tailwind v4 and `/index.css`.
+- `references/cms.md`: CMS schema types and fetch patterns.
+- `references/forms.md`: form schema and `talizen/form`.
+- `references/seo.md`: `metadata`, Open Graph, keywords, legacy SEO migration.
+- `references/i18n.md`: multilingual routing, locale APIs, `_i18n`, messages.
+- `references/sitemap.md`: root-level sitemap.
+- `references/carousel.md`: carousel/slideshow setup.
+- `references/error-handling.md`: bounded recovery for validation/runtime errors.
 
 For most site-authoring tasks, read `references/site-code.md` first, then load
-the specific topic reference only if the task touches that area.
+only the topic reference the task touches.
