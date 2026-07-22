@@ -29,7 +29,8 @@ Keep this file as the operating checklist. Load only the relevant
 - Use `getServerSideProps(context)` for route params and public first-render
   data. Do not read auth, call Func, or import browser SDKs in SSR.
 - Do not create `*.canvas.ts(x)` files unless explicitly asked; they are platform
-  generated.
+  generated. When asked to stage or preview drafts on the editor canvas, read
+  `references/canvas.md`.
 - Prefer Tailwind v4 utility classes. Use `/index.css` only for tokens,
   keyframes, complex selectors, or custom utilities. No inline `style` or page
   `<style>` blocks.
@@ -65,6 +66,8 @@ Keep this file as the operating checklist. Load only the relevant
 
 - `references/site-code.md`: routes, navigation, SSR data loading, local imports,
   import maps, `talizen.config.ts`, redirects, package type lookup, components.
+- `references/canvas.md`: `*.canvas.tsx` editor artboards, frame layout,
+  staging draft sections next to the page.
 - `references/css.md`: Tailwind v4 and `/index.css` conventions.
 - `references/cms.md`: CMS schema types and fetch patterns.
 - `references/i18n.md`: multilingual routing, locale APIs, `_i18n`, slugs, and
@@ -93,6 +96,8 @@ Keep this file as the operating checklist. Load only the relevant
   `references/seo.md`.
 - Multilingual routes, language switchers, translations, or localized CMS:
   read `references/i18n.md`.
+- Editing `*.canvas.tsx` or staging a draft for visual review: read
+  `references/canvas.md`.
 - Editor-navigation questions only: read `references/console-operations.md` and
   answer directly without versions, edits, or lint.
 - Custom event tracking: read `references/analytics.md`.
