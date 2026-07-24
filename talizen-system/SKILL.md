@@ -1,11 +1,32 @@
 ---
 name: talizen
+mandatory: true
 description: >
-  Guidance for Talizen platform apps and Creght editor operations. Use before
-  editing project files or giving platform-specific advice about /pages or /page routes,
-  talizen.config.ts, CMS/form/Func, Auth, Tailwind v4, SEO/metadata, importMap,
-  domains, DNS/SSL, publishing, website analytics, environment variables, or
-  other platform tools. Not required for greetings or unrelated chat.
+  MANDATORY platform baseline for ALL website work in Talizen/Creght — read and follow
+  BEFORE creating or editing any project file. Sites are built as Talizen React apps
+  (pages under /pages or /page + a root talizen.config.ts) by default; a genuinely
+  self-contained single HTML file goes under public/, never a project-root index.html.
+  Covers pages/routes, CMS/form/Func, Auth, Tailwind v4, SEO/metadata, importMap, domains,
+  DNS/SSL, publishing, analytics, env vars, and platform tools. Not for greetings or chat.
+tags:
+  - talizen
+  - platform
+  - website
+triggers:
+  - build a website
+  - create a page
+  - standalone HTML
+  - single HTML file
+  - double-click to open
+  - landing page
+  - poster
+  - 独立HTML网页
+  - 路演/展示页
+  - 保存文件双击即可打开
+examples:
+  - Build a website for a coffee shop
+  - Create an About page
+  - 制作一套独立HTML网页用于路演展示
 ---
 
 # Talizen
@@ -38,6 +59,9 @@ Keep this file as the operating checklist. Load only the relevant
   `@/lib/utils` are unsupported.
 - Do not commit/import local binaries. Reference media by absolute URL, data URI
   for tiny inline assets, or platform CDN URL from `upload_attachment`.
+- Static files, including a self-contained standalone HTML file, go under
+  `public/` (served at the domain root); a project-root `index.html` is NOT
+  served. For one-file artifacts (deck/poster/preview) read `references/site-code.md`.
 - Use structured `metadata`, not custom `seo` fields or raw SEO tags that
   `metadata` can express.
 - Use Talizen Func for small backend workflows and persistent writes. Never fake
@@ -65,7 +89,8 @@ Keep this file as the operating checklist. Load only the relevant
 ## Reference Routing
 
 - `references/site-code.md`: routes, navigation, SSR data loading, local imports,
-  import maps, `talizen.config.ts`, redirects, package type lookup, components.
+  import maps, `talizen.config.ts`, redirects, package type lookup, components,
+  `public/` static files and standalone HTML.
 - `references/canvas.md`: `*.canvas.tsx` editor artboards, frame layout,
   staging draft sections next to the page.
 - `references/css.md`: Tailwind v4 and `/index.css` conventions.
