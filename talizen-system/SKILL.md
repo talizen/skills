@@ -84,10 +84,8 @@ This is the operating checklist. See `## Reference Routing` for which
   sessions, OAuth callbacks, or account identity with Func or JSON tables.
 - Before using `talizen/auth`, read the installed `talizen` type definitions and
   follow that version's request/response models.
-- CMS rich-text body fields (e.g. a docs/blog article `body`) store and render
-  **HTML, not Markdown**. Author them as HTML (`<h2>`, `<p>`, `<ul><li><p>`,
-  `<strong>`, `<pre><code>`, `<table>`). Markdown put in these fields renders as
-  literal text. See `references/cms.md`.
+- CMS rich-text body fields (e.g. an article `body`) are HTML, not Markdown;
+  Markdown renders as literal text. See `references/cms.md`.
 
 ## Default Workflow
 
