@@ -18,6 +18,12 @@ directly when the field exists and is already rendered: preserve unrelated
 fields, update once, then re-read the entry to verify. If the field is missing
 or not bound in the page, make the minimal schema or rendering change instead.
 
+To change the order editors see in the CMS admin list, set each entry's `sort`
+via `update_content` (bigger first). Never delete and recreate entries to
+reorder them: it changes their ids, and site versions do not snapshot CMS
+content, so `delete_content` cannot be undone. For the order visitors see, pass
+`orderBy` in the page's `listContents` call instead.
+
 ## types/cms.d.ts file
 
 You can find all CMS schema definitions in `/types/cms.d.ts`.
@@ -137,9 +143,36 @@ Notes:
   `filter`. Fetch declarations only if you need exact parameter details.
 
 ### Order by
-`orderBy` supported: `created_at`, `created_at desc`, `updated_at`, `updated_at desc`, `sort`, `sort desc`
 
-default order by: `created_at desc`
+`orderBy` takes comma-separated terms, each `<field>` or `<field> asc|desc`
+(direction defaults to `asc`). Two kinds of field:
+
+- System columns: `id`, `created_at`, `updated_at`, `sort`
+- Body fields, addressed as `body.<key>`: `body.date desc`, nested
+  `body.meta.rank asc`
+
+Default order is `sort desc, id desc` — the same order the CMS admin list uses,
+so a page with no `orderBy` shows what the editor sees.
+
+```ts
+// Newest-first news list, ordered by the editorial publish date.
+const content = await listContents<Articles>("articles", {
+  limit: 10,
+  orderBy: "body.date desc, created_at desc",
+})
+```
+
+Notes:
+- A bare body field name (`orderBy: "date desc"`) is rejected with a 400; the
+  `body.` prefix is required. Unsupported fields fail loudly instead of silently
+  falling back to the default order.
+- Body values compare as stored: numbers numerically, strings
+  lexicographically. Dates therefore only sort correctly in ISO form
+  (`2026-07-17`), which is what a `format: date` field produces — free-text
+  `2026/7/1` will not.
+- Entries missing the field sort last.
+- Sort on the server with `orderBy`. Do not fetch a large `limit` and re-sort in
+  JS: it silently breaks as soon as the collection outgrows one page.
 
 ## Filter content
 
@@ -206,6 +239,11 @@ Common return shape:
   prev?: Blogs
 }
 ```
+
+Known limitation: prev/next neighbours are resolved against the default
+`sort desc, id desc` order only. Any other `orderBy` (including `body.<key>`)
+still returns default-order neighbours, so a detail page whose list is ordered
+by a body field will show neighbours that don't match that list.
 
 ## General CMS guidelines
 
