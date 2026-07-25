@@ -109,8 +109,8 @@ export default function ContactSection() {
 All form payload definitions are available in `/types/form.d.ts`.
 
 NOTE: This file is system-generated and cannot be edited. In the Talizen AI
-assistant, use `list_form()` to inspect existing forms and `create_form({...})`
-when a new form is required. The file is updated after successful form creation.
+assistant, use `create_form` or `update_form` to change the form schema, then
+re-read this file for the latest generated types.
 
 Rules:
 
