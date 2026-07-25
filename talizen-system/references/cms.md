@@ -11,11 +11,20 @@ because those declarations can change when the npm package is updated.
 Use your project's `/types/cms.d.ts` as the schema source of truth, and use
 `talizen/cms` for the platform-level fetch helpers.
 
+## Existing content operations
+
+When the user asks to change existing CMS content, use the platform CMS tools
+directly when the field exists and is already rendered: preserve unrelated
+fields, update once, then re-read the entry to verify. If the field is missing
+or not bound in the page, make the minimal schema or rendering change instead.
+
 ## types/cms.d.ts file
 
 You can find all CMS schema definitions in `/types/cms.d.ts`.
 
-NOTE: This file is system-generated and cannot be edited, Call `create_collection` tool when a new cms collection is required. This file will be updated upon successful collection creation.
+NOTE: This file is system-generated and cannot be edited. Use
+`create_collection` or `update_collection` to change the CMS schema, then
+re-read this file for the latest generated types.
 
 Rules:
 1. Read this file before writing CMS-related code.
