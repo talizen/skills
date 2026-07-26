@@ -74,6 +74,36 @@ Registration requires `account` and `password`; `email`, `phone`, `name`,
 OAuth providers are configured in project Auth settings. Page code should not
 hard-code client secrets, token endpoints, or callback logic.
 
+A provider's configuration is a file: `/backend/auth/<key>.json`, where the file
+name is the provider key (`github`, `google`, …). Edit it with the normal file
+tools — there are no provider tools:
+
+```json
+{
+  "name": "GitHub",
+  "status": "enable",
+  "client_id": "Iv1.xxx",
+  "redirect_url": "https://example.com/api/auth/callback/github",
+  "scopes": ["user:email"],
+  "endpoint": {
+    "auth_url": "https://github.com/login/oauth/authorize",
+    "token_url": "https://github.com/login/oauth/access_token",
+    "userinfo_url": "https://api.github.com/user"
+  }
+}
+```
+
+- **`client_secret` is never in the file** and writing it is rejected — files are
+  diffable and get shipped around. After creating a provider this way, tell the
+  user to set the secret in the platform console; login stays inactive until then
+  (`ready_for_login` shows the current state and is read-only).
+- Required on write: `name`, `client_id`, `redirect_url`, and
+  `endpoint.auth_url` / `token_url` / `userinfo_url`. All URLs must be http(s).
+  `status` is `enable` or `disable`.
+- An existing secret is preserved across file writes.
+- Renaming is refused; deleting a provider file removes the provider (config
+  only, no user data).
+
 ```ts
 import { getOAuthLoginUrl, listAuthProviders, loginWithOAuth } from "talizen/auth"
 ```

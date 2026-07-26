@@ -108,9 +108,33 @@ export default function ContactSection() {
 
 All form payload definitions are available in `/types/form.d.ts`.
 
-NOTE: This file is system-generated and cannot be edited. In the Talizen AI
-assistant, use `create_form` or `update_form` to change the form schema, then
-re-read this file for the latest generated types.
+NOTE: This file is system-generated and cannot be edited. A form's definition is
+a file: `/backend/form/<key>.json`, where the file name is the form key used at
+runtime. Edit it with the normal file tools (`list_files` / `read_file` /
+`write_file` / `replace_file`) — there are no form schema tools — then re-read
+this file for the latest generated types.
+
+```json
+{
+  "name": "Contact form",
+  "desc": "Homepage contact",
+  "json_schema": {
+    "type": "object",
+    "required": ["email"],
+    "properties": {
+      "email": { "type": "string" },
+      "message": { "type": "string" }
+    }
+  }
+}
+```
+
+Writes are validated: only `name` / `desc` / `json_schema` are allowed (no `key`
+— the file name is the key), `json_schema.type` must be `object`, `properties`
+must be non-empty, and every `required` entry must exist in `properties`.
+Notification settings live outside the file and are preserved across writes.
+Renaming and deleting are refused (deleting would discard submission logs) — do
+those in the platform console. Submissions stay tool-based.
 
 Rules:
 

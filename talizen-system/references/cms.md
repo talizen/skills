@@ -7,8 +7,8 @@ title: Talizen CMS Usage
 `/types/cms.d.ts` is the source of truth for content shapes; `talizen/cms` is
 the fetch API. Read the generated file before writing CMS code and import from
 it: `import type { Blogs, Authors } from "./types/cms"`. It is system-generated
-and cannot be edited — change the schema with `create_collection` /
-`update_collection`, then re-read it. Each item is
+and cannot be edited — change the schema in `/backend/cms/<key>.json`
+(see "Collection schema files" below), then re-read it. Each item is
 `{ __cmsKey, id, slug, body: { …fields } }`; treat fields as optional unless the
 schema guarantees otherwise and use optional chaining, especially on `body`.
 
@@ -18,6 +18,42 @@ neighbours). Call `fetch_module_types("talizen/cms")` only for an exact
 signature, an undocumented helper, a package version change, or a
 lint/typecheck error — fetched declarations always win over these examples.
 `get_import_map()` shows the effective `talizen` version.
+
+## Collection schema files
+
+A collection's definition is a file: `/backend/cms/<key>.json`. The file name is
+the collection key used by page code (`listContents("articles")`). List them with
+`list_files`, read with `read_file`, create/replace with `write_file`, and change
+one field with `replace_file` — there are no collection tools.
+
+```json
+{
+  "name": "Articles",
+  "desc": "News list",
+  "json_schema": {
+    "type": "object",
+    "required": ["title"],
+    "properties": {
+      "title": { "type": "string" },
+      "date": { "type": "string", "format": "date" }
+    }
+  }
+}
+```
+
+Rules the write is validated against (a failed write returns the reason; fix and
+retry):
+
+- Exactly these fields: `name`, `desc`, `json_schema`. No `key` field — the file
+  name is the key. Unknown or camelCase keys (`jsonSchema`) are rejected.
+- `json_schema.type` must be `object`, `properties` must be a non-empty object,
+  and every name in `required` must exist in `properties`.
+- Renaming is refused: page code references the key as a literal. Create the new
+  file, move content deliberately, then remove the old one.
+- Deleting is refused: it would discard the collection's content entries. Do it
+  in the platform console.
+- Content entries are not files (a collection can hold thousands). Use
+  `list_contents` / `get_content` / `create_content` / `update_content`.
 
 ## Existing content operations
 
