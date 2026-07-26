@@ -88,16 +88,17 @@ checklist; `## References` maps each topic to its `references/*.md`.
 2. Read `talizen.config.ts` when config, imports, SEO, custom code, site CSS, or
    platform behavior may be involved.
 3. Inspect relevant page/component/backend files and preserve local conventions.
-4. Create one rollback `create_version` before source edits — skip it for
-   copy-only and CMS-value-only edits.
-5. Make focused edits.
-6. Run `lint` after source changes; it is a compile and config check only. For a
-   new or repaired route also open it with `browser` (add `?dev` if it looks
-   wrong) and confirm the real content is there.
+4. Create one rollback `create_version` before the first source edit — skip it
+   for copy-only and CMS-value-only edits. One version per task, before only:
+   the next task's rollback version already captures this task's result, so a
+   second "after" version buys nothing and costs a full round trip.
+5. Make focused edits. Writes return the patched region and that file's
+   `syntax_errors` — do not re-read a file to confirm an edit landed.
+6. Run `lint` once after the last edit, never per edit; it is a compile, config
+   and cross-file check. For a new or repaired route also open it with `browser`
+   (add `?dev` if it looks wrong) and confirm the real content is there.
 7. On any lint, typecheck, build, preview, browser, or runtime failure, follow
    `references/error-handling.md` immediately.
-8. Create one final `create_version` after successful edits. At most two
-   versions per task: before and after.
 
 Editing an existing CMS entry is a platform-data operation, not a source edit:
 when the field exists and the page already renders it, update it with the CMS
