@@ -62,12 +62,15 @@ checklist; `## References` maps each topic to its `references/*.md`.
 - Do not create `*.canvas.ts(x)` unless explicitly asked; they are platform
   generated.
 - CMS collection / form / JSON table / auth provider **definitions are files**:
-  `/backend/{cms,form,table,auth}/<key>.json`. Read and edit them with the normal
+  `/platform/{cms,form,table,auth}/<key>.json`. Read and edit them with the normal
   file tools; there are no schema tools. File name = resource key. Content
   entries, table records and form logs are still tool-based. See the matching
   `references/*.md`.
+- `/platform/**` is live project state, not site source: it is **not** covered by
+  `create_version` / `revert_version`, and it is shared by every site in the
+  project. A rollback restores source files only — a schema change stays applied.
 - Never edit `/types/cms.d.ts` or `/types/form.d.ts`. They regenerate from
-  `/backend/cms/*.json` and `/backend/form/*.json`; re-read after a schema edit.
+  `/platform/cms/*.json` and `/platform/form/*.json`; re-read after a schema edit.
 - CMS rich-text body fields (e.g. an article `body`) are HTML, not Markdown;
   Markdown renders as literal text.
 - Use structured `metadata`, not custom `seo` fields or raw SEO tags it can
