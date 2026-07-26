@@ -90,6 +90,14 @@ user asks for changes.
 
 For carousels, read `references/carousel.md`.
 
+### Visual component props
+
+For visual configuration or multiple editable variants, define typed React
+props with literal defaults and pass literal values at the component call site.
+The editor supports `string`, `number`, `boolean`, and arrays of those primitive
+types; literal unions become option controls, and string props named `color` or
+`colors` become color controls.
+
 ## Component Registries And Effects
 
 For shadcn/ui-style registry components:

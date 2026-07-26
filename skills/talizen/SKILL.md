@@ -55,6 +55,8 @@ available; use them if exposed, otherwise inspect files and use the CLI.
 - Use `getServerSideProps(context)` for route params and first-render data.
   Read route params from `context.params`.
 - Do not create `*.canvas.ts(x)` files unless explicitly asked.
+- For visual configuration, including multiple variants, use typed React
+  component props with defaults; the editor supports visual control of props.
 - Prefer Tailwind v4 utilities. Avoid inline `style` and ad-hoc page `<style>`
   blocks.
 - Use relative imports for local files; aliases such as `@/lib/utils` are

@@ -61,6 +61,9 @@ checklist; `## References` maps each topic to its `references/*.md`.
   the platform CDN URL from `upload_attachment`.
 - Do not create `*.canvas.ts(x)` unless explicitly asked; they are platform
   generated.
+- For visual configuration, including multiple variants, use typed React
+  component props with defaults; the editor exposes component props as visual
+  controls.
 - CMS collection / form / JSON table / auth provider **definitions are files**:
   `/platform/{cms,form,table,auth}/<key>.json`. Read and edit them with the normal
   file tools; there are no schema tools. File name = resource key. Content
