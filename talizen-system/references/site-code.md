@@ -72,6 +72,11 @@ Fields: `params`, `searchParams`, `request` (`host` / `headers.get()`), `cookies
 Do not read auth or call Func in `getServerSideProps`. Use `useAuth()` in React
 UI and Func `ctx.auth` for protected backend actions.
 
+SSR is for public or cookie-vary-safe first-render data only; keep login state,
+private user data, and writes in browser SDK/Func/API flows. When part of the
+page changes fast (e.g. an article list with view counters), SSR/cache the
+stable part and fetch the volatile part after hydration.
+
 ## Components
 
 Keep page files for route composition. Put reusable UI in the project's existing
@@ -79,6 +84,9 @@ component root or shared component folder.
 
 If a user asks only for a component but expects a preview, make it visible from
 a page when possible.
+
+When importing an existing project, preserve its behavior and design unless the
+user asks for changes.
 
 For carousels, read `references/carousel.md`.
 
