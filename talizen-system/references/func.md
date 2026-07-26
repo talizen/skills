@@ -109,7 +109,7 @@ Func stores simple persistent project data through project JSON tables. The
 table must exist before writes. Use JSON Schema only to describe/validate record
 shape; do not design dynamic SQL migrations or table DDL in Func.
 
-A table's definition is a file: `/backend/table/<key>.json`, where the file name
+A table's definition is a file: `/platform/table/<key>.json`, where the file name
 is the table key. Create or edit it with the normal file tools — there are no
 table schema tools — using the same shape as a CMS collection file:
 `{ "name": …, "desc": …, "json_schema": { "type": "object", "properties": {…} } }`.

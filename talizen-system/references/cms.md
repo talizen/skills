@@ -7,7 +7,7 @@ title: Talizen CMS Usage
 `/types/cms.d.ts` is the source of truth for content shapes; `talizen/cms` is
 the fetch API. Read the generated file before writing CMS code and import from
 it: `import type { Blogs, Authors } from "./types/cms"`. It is system-generated
-and cannot be edited — change the schema in `/backend/cms/<key>.json`
+and cannot be edited — change the schema in `/platform/cms/<key>.json`
 (see "Collection schema files" below), then re-read it. Each item is
 `{ __cmsKey, id, slug, body: { …fields } }`; treat fields as optional unless the
 schema guarantees otherwise and use optional chaining, especially on `body`.
@@ -21,7 +21,7 @@ lint/typecheck error — fetched declarations always win over these examples.
 
 ## Collection schema files
 
-A collection's definition is a file: `/backend/cms/<key>.json`. The file name is
+A collection's definition is a file: `/platform/cms/<key>.json`. The file name is
 the collection key used by page code (`listContents("articles")`). List them with
 `list_files`, read with `read_file`, create/replace with `write_file`, and change
 one field with `replace_file` — there are no collection tools.

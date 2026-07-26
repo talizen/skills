@@ -74,7 +74,7 @@ Registration requires `account` and `password`; `email`, `phone`, `name`,
 OAuth providers are configured in project Auth settings. Page code should not
 hard-code client secrets, token endpoints, or callback logic.
 
-A provider's configuration is a file: `/backend/auth/<key>.json`, where the file
+A provider's configuration is a file: `/platform/auth/<key>.json`, where the file
 name is the provider key (`github`, `google`, …). Edit it with the normal file
 tools — there are no provider tools:
 

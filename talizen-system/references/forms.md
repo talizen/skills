@@ -109,7 +109,7 @@ export default function ContactSection() {
 All form payload definitions are available in `/types/form.d.ts`.
 
 NOTE: This file is system-generated and cannot be edited. A form's definition is
-a file: `/backend/form/<key>.json`, where the file name is the form key used at
+a file: `/platform/form/<key>.json`, where the file name is the form key used at
 runtime. Edit it with the normal file tools (`list_files` / `read_file` /
 `write_file` / `replace_file`) — there are no form schema tools — then re-read
 this file for the latest generated types.
