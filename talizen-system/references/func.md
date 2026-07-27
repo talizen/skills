@@ -144,8 +144,7 @@ This hashes the file, requests a short-lived upload URL, uploads the bytes
 directly from the browser to CDN storage, and confirms the upload. Do not send
 browser files or base64 through `invoke()` just to call `ctx.assets.upload`.
 When passing a `Blob` instead of a `File`, set `{ fileName: "image.webp" }`.
-Signed browser uploads are available on published site domains; preview domains
-currently reject them.
+Signed browser uploads are available on both preview and published site domains.
 
 When the bytes are generated inside Func and cannot originate in the browser,
 use:
