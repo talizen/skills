@@ -142,10 +142,17 @@ is no built-in payment SDK.
 
 Use `talizen/func` from browser-side pages/components.
 
-`invoke` defaults to a **5s** timeout (`timeoutMs: 5000`). Override it when the
-Func needs longer — for example model image or video generation often needs
-**60s+**. Errors such as `context deadline exceeded` or `context timeout`
-usually mean the default timeout is too short; raise `timeoutMs`.
+`invoke` defaults to **5s**; the runner's default maximum is **300s**. A bounded
+third-party request may use a longer timeout; detached background work may not.
+
+For `context deadline exceeded` / `context timeout`, before editing:
+
+1. Inspect the page's actual `invoke(..., { timeoutMs })`.
+2. Re-run the same input and model with a larger timeout. `run_func.timeout_ms`
+   controls only that self-test; it is not evidence of a platform hard limit.
+3. If the larger timeout succeeds, raise the caller's `timeoutMs` and verify the
+   production path. Do not shorten the requested output, reduce `max_tokens`,
+   switch models/providers, create tables, or add background jobs as the fix.
 
 ```tsx
 import { invoke, TalizenFuncError } from "talizen/func"
