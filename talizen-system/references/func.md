@@ -124,14 +124,39 @@ keys. Do not create account identity tables such as `users` or `auth_users`.
 
 ## Assets
 
-When Func creates large runtime assets, upload them with:
+Choose the upload path based on where the bytes originate.
 
-```ts
-ctx.assets.upload({ filename, mimeType, base64 })
+For a `File` or `Blob` selected in the browser, use the CDN signed-upload client:
+
+```tsx
+import { uploadAsset } from "talizen/assets"
+
+const asset = await uploadAsset(file, {
+  onFileUploadProcess(fileName, progress) {
+    console.log(fileName, progress)
+  },
+})
+
+// asset.fileUrl, asset.filePath, asset.size
 ```
 
-Store returned URL/path/size metadata in JSON tables. Do not store or return
-large base64 payloads.
+This hashes the file, requests a short-lived upload URL, uploads the bytes
+directly from the browser to CDN storage, and confirms the upload. Do not send
+browser files or base64 through `invoke()` just to call `ctx.assets.upload`.
+When passing a `Blob` instead of a `File`, set `{ fileName: "image.webp" }`.
+Signed browser uploads are available on published site domains; preview domains
+currently reject them.
+
+When the bytes are generated inside Func and cannot originate in the browser,
+use:
+
+```ts
+const asset = ctx.assets.upload({ filename, mimeType, base64 })
+```
+
+`ctx.assets.upload()` returns `{ fileUrl, filePath, size }`. Store that metadata
+in JSON tables. Do not store or return large base64 payloads. Func asset uploads
+are limited to 20 MiB; prefer browser signed upload for user-selected files.
 
 ## Payment
 
