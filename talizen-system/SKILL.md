@@ -80,6 +80,9 @@ checklist; `## References` maps each topic to its `references/*.md`.
   express.
 - Use Func for small backend workflows and persistent writes. Never fake
   persistence in React state or expose secrets/project IDs in page code.
+- For a reported Func/runtime failure, read `references/error-handling.md` and
+  `references/func.md` before editing. For deadline errors, inspect the caller's
+  timeout; never infer a platform hard limit from a `run_func` self-test.
 - Use `talizen/auth` `useAuth()` for auth UI, and read the installed `talizen`
   types first to match that version's request/response models. Never build
   users, passwords, sessions, OAuth callbacks, or account identity with Func or
