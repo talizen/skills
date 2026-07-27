@@ -19,9 +19,10 @@ key `booking`. Edit Funcs as files; use `run_func` only for self-tests with
 sample input.
 
 Do not use Func for normal CMS rendering, static contact forms covered by
-`talizen/form`, long-running jobs, streaming, heavy file processing, custom
-identity/session systems, OAuth callbacks, or token exchange. For auth UI, use
-`talizen/auth` and read `references/auth.md`.
+`talizen/form`, detached background jobs, heavy file processing, custom
+identity/session systems, OAuth callbacks, or token exchange. Bounded SSE
+streaming is supported. For auth UI, use `talizen/auth` and read
+`references/auth.md`.
 
 ## Keys And Calls
 
@@ -177,6 +178,39 @@ try {
   // timeout or other Func errors
 }
 ```
+
+For bounded incremental output, send SSE events in the Func and consume the
+native Fetch stream; ordinary `invoke` expects one JSON result:
+
+```ts
+// /backend/func/writer.ts
+export async function main(input, ctx) {
+  ctx.sse.send("token", { text: "Hello" })
+  return { ok: true }
+}
+
+// page/component
+const response = await fetch("/func/writer?stream=1&timeout_ms=120000", {
+  method: "POST",
+  headers: { Accept: "text/event-stream", "Content-Type": "application/json" },
+  body: JSON.stringify(input),
+})
+if (!response.ok || !response.body) throw new Error("Func stream failed")
+const reader = response.body.getReader()
+const decoder = new TextDecoder()
+while (true) {
+  const { done, value } = await reader.read()
+  if (done) break
+  const sseChunk = decoder.decode(value, { stream: true })
+  // Parse `event:` / `data:` frames separated by a blank line.
+}
+```
+
+Read chunks are arbitrary byte boundaries, not complete events; buffer across
+reads and split SSE frames only on a blank line.
+
+The platform finishes with `done` or `error`. Timeout still applies, and cookies
+cannot be changed after the first event.
 
 Call Func from event handlers for mutations. Keep persistent writes inside Func,
 not React state alone.
