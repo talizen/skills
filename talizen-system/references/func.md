@@ -34,9 +34,9 @@ Func keys are extensionless paths:
 Dots are reserved for method calls:
 
 ```ts
-invoke("booking.create", input) // key booking, method create
-invoke("profile/settings.update", input)
-invoke("booking", input) // key booking, method main
+invoke("booking.create", input); // key booking, method create
+invoke("profile/settings.update", input);
+invoke("booking", input); // key booking, method main
 ```
 
 Use `main` only for a single-operation Func. For related operations, export
@@ -46,7 +46,7 @@ multiple methods from one file.
 
 1. Export ESM functions: `export function method(input, ctx)`.
 2. Put all platform runtime access behind `ctx`.
-3. Import only TypeScript types from `talizen/func-runtime` when needed.
+3. Import TypeScript types from `talizen/func-runtime` when needed.
 4. Validate and normalize all input inside the Func.
 5. Return structured JSON for expected business states; throw only for invalid
    requests or unexpected failures.
@@ -59,10 +59,10 @@ multiple methods from one file.
    retries inside Func.
 
 ```ts
-import type { TalizenFuncContext } from "talizen/func-runtime"
+import type { TalizenFuncContext } from "talizen/func-runtime";
 
 export function create(input, ctx: TalizenFuncContext) {
-  return ctx.db.insert("appointments", input)
+  return ctx.db.insert("appointments", input);
 }
 ```
 
@@ -93,11 +93,11 @@ examples, comments, or generated output.
 Use Func auth only for protected backend actions:
 
 ```ts
-import type { TalizenFuncContext } from "talizen/func-runtime"
+import type { TalizenFuncContext } from "talizen/func-runtime";
 
 export function create(input, ctx: TalizenFuncContext) {
-  const user = ctx.auth.requireUser()
-  return ctx.db.insert("orders", { ...input, userId: user.id })
+  const user = ctx.auth.requireUser();
+  return ctx.db.insert("orders", { ...input, userId: user.id });
 }
 ```
 
@@ -129,15 +129,15 @@ Choose the upload path based on where the bytes originate.
 For a `File` or `Blob` selected in the browser, use the CDN signed-upload client:
 
 ```tsx
-import { uploadAsset } from "talizen/assets"
+import { uploadAsset } from "talizen/assets";
 
 const asset = await uploadAsset(file, {
   onFileUploadProcess(fileName, progress) {
-    console.log(fileName, progress)
+    console.log(fileName, progress);
   },
-})
+});
 
-// asset.fileUrl, asset.filePath, asset.size
+// asset.fileUrl, asset.url (same value), asset.size
 ```
 
 This hashes the file, requests a short-lived upload URL, uploads the bytes
@@ -151,12 +151,15 @@ When the bytes are generated inside Func and cannot originate in the browser,
 use:
 
 ```ts
-const asset = ctx.assets.upload({ filename, mimeType, base64 })
+const asset = ctx.assets.upload({ filename, mimeType, base64 });
+// asset.fileUrl === asset.url
 ```
 
-`ctx.assets.upload()` returns `{ fileUrl, filePath, size }`. Store that metadata
-in JSON tables. Do not store or return large base64 payloads. Func asset uploads
-are limited to 20 MiB; prefer browser signed upload for user-selected files.
+`ctx.assets.upload()` returns `{ fileUrl, url, size }`; `url` is a compatibility
+alias of `fileUrl`. It does not expose the internal storage path. Store the URL
+and size when needed. Do not store or return large base64 payloads. Func asset
+uploads are limited to 20 MiB; prefer browser signed upload for user-selected
+files.
 
 ## Payment
 
@@ -181,24 +184,25 @@ For `context deadline exceeded` / `context timeout`, before editing:
    switch models/providers, create tables, or add background jobs as the fix.
 
 ```tsx
-import { invoke, TalizenFuncError } from "talizen/func"
+import { invoke, TalizenFuncError } from "talizen/func";
 
 try {
-  const result = await invoke("booking.create", input)
+  const result = await invoke("booking.create", input);
 } catch (error) {
-  const message = error instanceof TalizenFuncError ? error.message : "Unable to submit."
+  const message =
+    error instanceof TalizenFuncError ? error.message : "Unable to submit.";
 }
 ```
 
 Set a longer timeout when needed:
 
 ```tsx
-import { invoke } from "talizen/func"
+import { invoke } from "talizen/func";
 
 try {
   const result = await invoke("image.generate", input, {
     timeoutMs: 60000, // e.g. model image / video generation
-  })
+  });
 } catch (error) {
   // timeout or other Func errors
 }
@@ -210,8 +214,8 @@ native Fetch stream; ordinary `invoke` expects one JSON result:
 ```ts
 // /backend/func/writer.ts
 export async function main(input, ctx) {
-  ctx.sse.send("token", { text: "Hello" })
-  return { ok: true }
+  ctx.sse.send("token", { text: "Hello" });
+  return { ok: true };
 }
 
 // page/component
@@ -219,14 +223,14 @@ const response = await fetch("/func/writer?stream=1&timeout_ms=120000", {
   method: "POST",
   headers: { Accept: "text/event-stream", "Content-Type": "application/json" },
   body: JSON.stringify(input),
-})
-if (!response.ok || !response.body) throw new Error("Func stream failed")
-const reader = response.body.getReader()
-const decoder = new TextDecoder()
+});
+if (!response.ok || !response.body) throw new Error("Func stream failed");
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
 while (true) {
-  const { done, value } = await reader.read()
-  if (done) break
-  const sseChunk = decoder.decode(value, { stream: true })
+  const { done, value } = await reader.read();
+  if (done) break;
+  const sseChunk = decoder.decode(value, { stream: true });
   // Parse `event:` / `data:` frames separated by a blank line.
 }
 ```
@@ -247,10 +251,10 @@ for public or cookie-vary-safe first render data, but intentionally does not
 expose `ctx.auth`, `ctx.func`, `ctx.db`, or `ctx.cache`.
 
 ```ts
-import type { TalizenServerSideContext } from "talizen/server-runtime"
+import type { TalizenServerSideContext } from "talizen/server-runtime";
 
 export async function getServerSideProps(ctx: TalizenServerSideContext) {
-  return { props: { host: ctx.request.host } }
+  return { props: { host: ctx.request.host } };
 }
 ```
 
