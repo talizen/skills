@@ -72,12 +72,35 @@ Common helpers:
 - `ctx.auth.currentUser()` and `ctx.auth.requireUser()`
 - `ctx.assets.upload({ filename, mimeType, base64 })`
 - `ctx.cache.get/set/del/incr/expire(...)`
+- `ctx.email.send/sendCode/verifyCode(...)` (requires an email integration)
 - `ctx.request.host/ip/method/path`
 - `ctx.response.status(code)`
 
-Func HTTP responses return `{ "result": ... }` or `{ "error": "..." }`.
+Web Crypto is available through the global `crypto`. AES-GCM and AES-CBC
+encryption/decryption are supported; AES-CBC uses a 16-byte IV and automatic
+PKCS#7 padding. Do not import `node:crypto`.
+
+Ordinary Func returns produce `{ "result": ... }` or `{ "error": "..." }`.
 Browser `invoke()` unwraps successful `result` values and throws
-`TalizenFuncError` for errors.
+`TalizenFuncError` for errors. For webhooks or other callers that require an
+exact HTTP body, return the global Web-compatible `Response`; it bypasses the
+JSON envelope:
+
+```ts
+export async function notify(_input, ctx) {
+  await verifyWebhook(await ctx.request.text());
+  return new Response("success");
+}
+```
+
+`new Response("success")` returns status 200 with
+`text/plain;charset=UTF-8`. Pass `{ status, headers }` only when customization
+is required. `Response` is a runtime global and must not be imported as a
+runtime value; `talizen/func-runtime` exports type-only `Response` and
+`ResponseInit` aliases for explicit annotations. JSON, form-encoded, text, and binary POST bodies can reach Func;
+non-JSON requests receive `{}` as `input` while exact bytes remain available
+through the one-shot `ctx.request.text()` / `arrayBuffer()` readers. Use native
+`fetch()` rather than `invoke()` for a method that returns `Response`.
 
 ## Secrets And Environment
 
@@ -87,6 +110,13 @@ to manage platform env vars.
 
 Never put secrets in `talizen.config.ts`, Func files, pages, components,
 examples, comments, or generated output.
+
+Some third-party services have a managed **integration** instead: the user
+connects them once in the Creght Backend / Integrations panel at
+`panel/backend/integrations`, and the credential stays server-side rather than
+being exposed as an env var. Email (Resend) works this way — see
+"Email And Verification Codes". Agents should not claim to manage integrations
+either; ask the user to connect one.
 
 ## Auth In Func
 
@@ -103,6 +133,50 @@ export function create(input, ctx: TalizenFuncContext) {
 
 React UI must use `useAuth()` from `talizen/auth`. Do not implement passwords,
 sessions, login, registration, or OAuth callbacks in Func.
+
+## Email And Verification Codes
+
+Sending email and email verification codes go through `ctx.email`. This requires
+the user to have connected an email integration (currently Resend) in
+`panel/backend/integrations`. The provider credential stays on the server:
+**never write an API key, `fetch("https://api.resend.com/...")`, or an
+`Authorization` header for email in Func code.**
+
+```ts
+import type { TalizenFuncContext } from "talizen/func-runtime";
+
+export function sendLoginCode(input, ctx: TalizenFuncContext) {
+  ctx.email.sendCode({ to: input.email, scene: "login" });
+  return { ok: true };
+}
+
+export function verifyLoginCode(input, ctx: TalizenFuncContext) {
+  const ok = ctx.email.verifyCode({
+    to: input.email,
+    scene: "login",
+    code: input.code,
+  });
+  if (!ok) throw new Error("invalid or expired code");
+  return { ok: true };
+}
+```
+
+`ctx.email.send({ to, subject, html, text })` sends an arbitrary message and
+returns `{ id, provider }`; `to` accepts one address or an array.
+
+The platform already enforces code generation, expiry, single-use consumption,
+constant-time comparison, the wrong-attempt cap, and per-recipient rate limiting.
+**Do not reimplement any of it** — no `Math.random()` codes, no `ctx.cache`-based
+code storage, no hand-rolled attempt counters. `scene` namespaces codes by
+purpose, so a login code and a password-reset code for the same address never
+collide.
+
+If `ctx.email` reports that no integration is configured, verified, or enabled,
+that is a user action in `panel/backend/integrations` — do not work around it by
+calling a provider API directly.
+
+A verified code is proof of mailbox control, not a session. Establish login state
+through project auth; see "Auth In Func".
 
 ## JSON Tables
 
@@ -164,7 +238,22 @@ files.
 
 Payment integrations are custom server-side Func work. Keep provider secrets in
 env vars, validate webhooks/signatures, and return explicit order states. There
-is no built-in payment SDK.
+is no built-in payment SDK, and unlike email there is **no managed payment
+integration and no `ctx.payment`** — payment providers differ too much to share
+one interface, so write the checkout and webhook logic as ordinary Func code. A payment callback must verify the provider
+signature, merchant/app identity, local order, amount, and paid state before an
+idempotent update, then return the provider's exact acknowledgement with
+`Response`.
+
+For Alipay OpenAPI AES content encryption, Base64-decode the console AES key,
+import it as `AES-CBC`, and use a 16-byte zero IV. Encrypt the UTF-8
+`biz_content`, Base64-encode the ciphertext, set `encrypt_type=AES`, then RSA2
+sign the complete request parameters. AES does not replace RSA2 signing or
+asynchronous-notification verification. A standard `alipay.trade.page.pay`
+asynchronous notification remains form data: verify it with RSA2 and do not
+AES-decrypt the whole body. Decrypt only a field explicitly documented as
+encrypted. Verify an encrypted OpenAPI response's RSA2 signature before
+decrypting it.
 
 ## Calling From Pages
 
@@ -265,6 +354,8 @@ Keep auth, private data, writes, and cache/db logic in Func/browser flows.
 2. Create or verify required JSON tables.
 3. Add Func code under `/backend/func`.
 4. Validate input and keep secrets in `process.env`.
-5. Call with `invoke("key.method", input)` from UI.
-6. Use `run_func` for sample backend tests when useful.
-7. Run lint after page/component edits.
+5. For email or verification codes, use `ctx.email` and require an email
+   integration; never call a mail provider API directly.
+6. Call with `invoke("key.method", input)` from UI.
+7. Use `run_func` for sample backend tests when useful.
+8. Run lint after page/component edits.
