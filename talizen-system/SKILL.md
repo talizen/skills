@@ -128,7 +128,8 @@ reach its topic; do not read the others.
 - `auth.md` — login, registration, logout, current user, OAuth, account UI,
   protected flows.
 - `func.md` — Func code, JSON tables, secrets, asset uploads, third-party API
-  keys, auth inside Func, `invoke(...)`, `/api/func`.
+  keys, integrations, sending email and email verification codes (`ctx.email`),
+  auth inside Func, `invoke(...)`, `/api/func`.
 - `seo.md` — `metadata`, viewport, Open Graph, keywords, favicon, legacy `seo`
   migration.
 - `carousel.md` — carousel/slideshow setup.
