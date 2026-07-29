@@ -85,6 +85,12 @@ Secrets and integrations
   reimplement any of it: no `Math.random()` codes, no `ctx.cache` code storage,
   no hand-rolled attempt counters. A verified code proves mailbox control, not a
   session.
+- `ctx.email.sendCode` / `verifyCode` are the **site's own** primitive: the result
+  means something only to the site, and the platform records nothing. To let
+  "verified" affect registration (or, later, password reset and re-binding), use
+  `ctx.verify` — its outcome is recorded by the platform and consumed by auth.
+  Never verify a code and then assert the result to another call; the proof, not
+  a boolean, is what carries.
 - There is **no managed payment integration and no `ctx.payment`**, and no
   built-in payment SDK. A payment callback must verify the provider signature,
   merchant identity, local order, amount, and paid state before an idempotent
@@ -130,7 +136,14 @@ Timeouts
 Names only — read the live docs for signatures, return shapes and limits:
 
 - `ctx.db` — project JSON tables
-- `ctx.auth` — current / required user
+- `ctx.auth` — current / required user; `register` when the project routes
+  registration through Func (`register_entry: "func"`), which is where the site's
+  own rules — invite codes, domain allowlists — actually hold. It takes no code or
+  proof argument: contact verification is enforced by the platform per project
+  policy, and sessions are issued by the platform, never by Func.
+- `ctx.verify` — `start` / `confirm` a contact proof (`channel`, `to`, `purpose`).
+  The proof is stored server-side and travels as an httpOnly cookie; Func cannot
+  read, forge, or forward it.
 - `ctx.cache` — short-lived values, counters, expiry
 - `ctx.request`, `ctx.response`, `ctx.cookies` — request info, status, cookies
 - `ctx.assets` — upload bytes generated inside Func

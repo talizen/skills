@@ -69,6 +69,52 @@ top-level `register(input)` helper exists for low-level non-hook flows only.
 Registration requires `account` and `password`; `email`, `phone`, `name`,
 `avatar`, and `profile` are optional profile fields.
 
+## Verified Contacts
+
+Whether registration requires a proven email (or phone) is **project policy**,
+not a call argument. Read it at `/platform/auth.json`:
+
+```json
+{
+  "open_register": true,
+  "register_requires": ["email"],
+  "register_entry": "sdk"
+}
+```
+
+- `register_requires` empty → nothing changes; `register(...)` behaves as before.
+- `register_requires: ["email"]` → the page must prove the address first. The
+  proof lives server-side; the browser only carries an httpOnly cookie, so
+  **never try to read, store, or pass a proof yourself**:
+
+```tsx
+import { useAuth, startVerification, confirmVerification } from "talizen/auth"
+
+await startVerification({ channel: "email", to: email, purpose: "register" })
+await confirmVerification({ channel: "email", to: email, purpose: "register", code })
+await useAuth().register({ account: email, email, password })   // no code argument
+```
+
+- The proof is bound to that exact address and to `purpose`, is single-use, and
+  expires in 10 minutes. Registering with a different address than the one proven
+  fails.
+- `register_entry: "func"` → direct `useAuth().register(...)` returns 403; the
+  project registers through its own Func (`ctx.auth.register`). Use it when the
+  site has its own server-side rules (invite codes, domain allowlists) — rules
+  written in page code are only advisory.
+- `user.email_verified_at` is non-null **only** when the address was proven. It
+  stays null on projects with an empty policy, so do not read it as "an email was
+  filled in".
+- Do not gate login on a verified email; existing users would be locked out.
+  Gate specific actions inside Func instead.
+
+**You may tighten this file, not loosen it.** Adding a channel, switching
+`register_entry` to `func`, or closing registration is allowed. Removing a
+channel, switching back to `sdk`, or reopening registration is rejected — tell
+the user to change it in the editor under Auth settings. Turning on `email`
+requires the project to already have a verified email integration; the write
+fails with a message pointing at Backend → Integrations.
+
 ## OAuth
 
 OAuth providers are configured in project Auth settings. Page code should not
