@@ -99,13 +99,16 @@ await useAuth().register({ account: email, email, password })   // no code argum
 - The proof is bound to that exact address and to `purpose`, is single-use, and
   expires in 10 minutes. Registering with a different address than the one proven
   fails.
-- `register_entry: "func"` → direct `useAuth().register(...)` returns 403; the
-  project registers through its own Func (`ctx.auth.register`). Use it when the
-  site has its own server-side rules (invite codes, domain allowlists) — rules
-  written in page code are only advisory.
-- `user.email_verified_at` is non-null **only** when the address was proven. It
-  stays null on projects with an empty policy, so do not read it as "an email was
-  filled in".
+- `register_entry: "func"` → direct `useAuth().register(...)` **and** direct
+  `startVerification(...)` both return 403; the project registers through its own
+  Func (`ctx.auth.register`). Use it when the site has its own server-side rules
+  (invite codes, domain allowlists) — rules written in page code are only advisory.
+  On that path verification is performed by the Func's own code and there is no
+  project setting for it, so the settings below describe page-code registration
+  only.
+- There is no `email_verified_at` on the user. Do not read, display, or gate on
+  one, and do not add a table column to imitate it — verification is a step at
+  registration, not a per-user flag.
 - Do not gate login on a verified email; existing users would be locked out.
   Gate specific actions inside Func instead.
 - `expose_account_exists` decides what happens when the address already has an

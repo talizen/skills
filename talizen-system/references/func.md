@@ -85,12 +85,15 @@ Secrets and integrations
   reimplement any of it: no `Math.random()` codes, no `ctx.cache` code storage,
   no hand-rolled attempt counters. A verified code proves mailbox control, not a
   session.
-- `ctx.email.sendCode` / `verifyCode` are the **site's own** primitive: the result
-  means something only to the site, and the platform records nothing. To let
-  "verified" affect registration (or, later, password reset and re-binding), use
-  `ctx.verify` — its outcome is recorded by the platform and consumed by auth.
-  Never verify a code and then assert the result to another call; the proof, not
-  a boolean, is what carries.
+- `ctx.email.sendCode` / `verifyCode` are the **site's own** namespace (order
+  confirmations, unsubscribe confirmations). Registration, password reset and
+  re-binding use `ctx.verify`, which runs on the platform's reserved scene.
+- When registration is routed through Func (`register_entry: "func"`),
+  **verification is performed by your code and the platform checks nothing**:
+  `ctx.auth.register` takes no code, no ticket, and no "already verified" flag.
+  Confirm the code first and return early if it fails — reaching `register` is
+  itself the decision that verification passed. There is no project setting to
+  turn verification on for this path, so never tell the user to enable one.
 - There is **no managed payment integration and no `ctx.payment`**, and no
   built-in payment SDK. A payment callback must verify the provider signature,
   merchant identity, local order, amount, and paid state before an idempotent
@@ -138,12 +141,12 @@ Names only — read the live docs for signatures, return shapes and limits:
 - `ctx.db` — project JSON tables
 - `ctx.auth` — current / required user; `register` when the project routes
   registration through Func (`register_entry: "func"`), which is where the site's
-  own rules — invite codes, domain allowlists — actually hold. It takes no code or
-  proof argument: contact verification is enforced by the platform per project
-  policy, and sessions are issued by the platform, never by Func.
-- `ctx.verify` — `start` / `confirm` a contact proof (`channel`, `to`, `purpose`).
-  The proof is stored server-side and travels as an httpOnly cookie; Func cannot
-  read, forge, or forward it.
+  own rules — invite codes, domain allowlists — actually hold. It takes no code,
+  ticket, or verification flag: verify before calling it. Sessions are issued by
+  the platform, never by Func.
+- `ctx.verify` — `start` / `confirm` a verification code (`channel`, `to`,
+  `purpose`). In Func, `confirm` returns only a boolean: there is no ticket and no
+  cookie, because confirm and register run in the same execution.
 - `ctx.cache` — short-lived values, counters, expiry
 - `ctx.request`, `ctx.response`, `ctx.cookies` — request info, status, cookies
 - `ctx.assets` — upload bytes generated inside Func
