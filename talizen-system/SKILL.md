@@ -102,8 +102,11 @@ checklist; `## References` maps each topic to its `references/*.md`.
 5. Make focused edits. Writes return the patched region and that file's
    `syntax_errors` — do not re-read a file to confirm an edit landed.
 6. Run `lint` once after the last edit, never per edit; it is a compile, config
-   and cross-file check. For a new or repaired route also open it with `browser`
-   (add `?dev` if it looks wrong) and confirm the real content is there.
+   and cross-file check, and its `browser_check` already exercises the live
+   preview. Do not follow it with a routine `browser` call — a screenshot is not
+   how a task ends. Open a route only when something is genuinely unverified: a
+   brand-new route, a reported failure (add `?dev`), or a subjective aesthetic
+   request you cannot read off the code.
 7. On any lint, typecheck, build, preview, browser, or runtime failure, follow
    `references/error-handling.md` immediately.
 
