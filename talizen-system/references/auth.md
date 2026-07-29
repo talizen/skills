@@ -78,7 +78,8 @@ not a call argument. Read it at `/platform/auth.json`:
 {
   "open_register": true,
   "register_requires": ["email"],
-  "register_entry": "sdk"
+  "register_entry": "sdk",
+  "expose_account_exists": false
 }
 ```
 
@@ -107,10 +108,18 @@ await useAuth().register({ account: email, email, password })   // no code argum
   filled in".
 - Do not gate login on a verified email; existing users would be locked out.
   Gate specific actions inside Func instead.
+- `expose_account_exists` decides what happens when the address already has an
+  account. Off (default): the request gets the **same response as any other** and
+  the address receives an "you already have an account" email instead of a code —
+  so nobody can use the endpoint to probe which emails have accounts. On:
+  `startVerification` fails with 409 and a clear message. Off is not a bug to work
+  around: do not add your own "is this email taken" check in page code, which is
+  exactly the probe the default prevents.
 
 **You may tighten this file, not loosen it.** Adding a channel, switching
 `register_entry` to `func`, or closing registration is allowed. Removing a
-channel, switching back to `sdk`, or reopening registration is rejected — tell
+channel, switching back to `sdk`, reopening registration, or turning on
+`expose_account_exists` is rejected — tell
 the user to change it in the editor under Auth settings. Turning on `email`
 requires the project to already have a verified email integration; the write
 fails with a message pointing at Backend → Integrations.
