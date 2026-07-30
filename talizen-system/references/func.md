@@ -110,7 +110,18 @@ Data and identity
   `auth_users`.
 - Use `ctx.auth.requireUser()` for protected backend actions. Auth UI uses
   `useAuth()` from `talizen/auth` (see `references/auth.md`); never hand-roll
-  password hashing, sessions, login, or OAuth callbacks in Func.
+  password hashing, session tokens, or OAuth callbacks in Func.
+- **Sign-in can be a Func**: `ctx.auth.login(ref)` issues a session for an existing
+  user, which is the only way to build passwordless (emailed-code) login or to apply
+  your own rules — bans, required onboarding steps, tenant checks — at sign-in. The
+  platform still mints the session; Func never sees the token, and direct
+  `useAuth().login()` keeps working alongside it.
+  **The ref must come from a fact the server just verified** — the user returned by
+  `ctx.users.find` after `ctx.email.verifyCode` succeeded, or the account whose
+  password `ctx.users.checkPassword` just accepted. Never
+  `ctx.auth.login({ email: input.email })`: that is "whoever the browser claims to
+  be", and unlike a bad password change it leaves the real user no symptom.
+  Every session issued this way is recorded with the Func file that issued it.
 - **Password reset / change has no platform endpoint — write it in Func.** Two
   steps: `ctx.users.find({ email })` then `ctx.email.sendCode`, and later
   `ctx.email.verifyCode` then `ctx.users.setPassword({ email, password })`.
@@ -157,8 +168,9 @@ Names only — read the live docs for signatures, return shapes and limits:
 - `ctx.auth` — **the caller of this request**: current / required user, plus
   `register` when the project routes registration through Func
   (`register_entry: "func"`), which is where the site's own rules — invite codes,
-  domain allowlists — actually hold. It takes no code, ticket, or verification
-  flag: verify before calling it. Sessions are issued by the platform, never by Func.
+  domain allowlists — actually hold, and `login` to sign an existing user in.
+  Neither takes a code, ticket, or verification flag: verify before calling them.
+  Session tokens are minted by the platform, never handled by Func code.
 - `ctx.users` — **the project's user directory**, a separate top-level namespace
   because it can point at anybody, unlike `ctx.auth`: `find` (returns null when
   absent), `checkPassword` (boolean; failures share the login lockout budget and

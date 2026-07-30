@@ -119,6 +119,19 @@ await useAuth().register({ account: email, email, password })   // no code argum
   around: do not add your own "is this email taken" check in page code, which is
   exactly the probe the default prevents.
 
+## Sign-in Through Func
+
+`useAuth().login()` stays the normal path. A project only needs its own Func when
+sign-in has to do something the SDK cannot express — **passwordless login with an
+emailed code**, or server-side rules at sign-in (bans, required onboarding, tenant
+checks). That Func uses `ctx.users.checkPassword` / `ctx.email.verifyCode` and then
+`ctx.auth.login`; see `references/func.md`.
+
+There is no setting that closes direct `/auth/login`, so a site can have both. Page
+code calls the Func through `invoke()` and treats a resolved promise as signed in —
+the session cookie arrives with that response. Every sign-in is recorded (source,
+Func file, IP) and the owner can read it per user in the editor.
+
 ## Forgot / Change Password
 
 There is **no SDK call and no platform endpoint for this** — `useAuth()` has no
