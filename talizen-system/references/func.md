@@ -86,8 +86,8 @@ Secrets and integrations
   no hand-rolled attempt counters. A verified code proves mailbox control, not a
   session.
 - `ctx.email.sendCode` / `verifyCode` are the **site's own** namespace (order
-  confirmations, unsubscribe confirmations). Registration, password reset and
-  re-binding use `ctx.verify`, which runs on the platform's reserved scene.
+  confirmations, unsubscribe confirmations, **password reset**). Only
+  registration uses `ctx.verify`, which runs on the platform's reserved scene.
 - When registration is routed through Func (`register_entry: "func"`),
   **verification is performed by your code and the platform checks nothing**:
   `ctx.auth.register` takes no code, no ticket, and no "already verified" flag.
@@ -109,8 +109,23 @@ Data and identity
   identity key, and never create account identity tables such as `users` or
   `auth_users`.
 - Use `ctx.auth.requireUser()` for protected backend actions. Auth UI uses
-  `useAuth()` from `talizen/auth` (see `references/auth.md`); never build
-  passwords, sessions, login, registration, or OAuth callbacks in Func.
+  `useAuth()` from `talizen/auth` (see `references/auth.md`); never hand-roll
+  password hashing, sessions, login, or OAuth callbacks in Func.
+- **Password reset / change has no platform endpoint — write it in Func.** Two
+  steps: `ctx.users.find({ email })` then `ctx.email.sendCode`, and later
+  `ctx.email.verifyCode` then `ctx.users.setPassword({ email, password })`.
+  `setPassword` takes no code or ticket: verifying first *is* the authorization.
+  Three hard rules, because getting them wrong is account takeover or an
+  enumeration oracle: look the user up **before** sending a code; return the
+  **same** response whether or not the user exists; never pass `setPassword`'s
+  404 back to the browser. The platform hashes and revokes all of that user's
+  sessions — including the caller's, so route them to login afterwards.
+- A **signed-in** user changing their own password confirms the old one with
+  `ctx.users.checkPassword`, and must be pointed at by the id from
+  `ctx.auth.requireUser()` — never a `userId`/`email` taken from the request body,
+  which would let any logged-in visitor change somebody else's password. Do not
+  "verify" the old password by calling login from page code: the Func can be
+  called directly, so that check is not a boundary.
 
 Boundaries
 
@@ -139,11 +154,16 @@ Timeouts
 Names only — read the live docs for signatures, return shapes and limits:
 
 - `ctx.db` — project JSON tables
-- `ctx.auth` — current / required user; `register` when the project routes
-  registration through Func (`register_entry: "func"`), which is where the site's
-  own rules — invite codes, domain allowlists — actually hold. It takes no code,
-  ticket, or verification flag: verify before calling it. Sessions are issued by
-  the platform, never by Func.
+- `ctx.auth` — **the caller of this request**: current / required user, plus
+  `register` when the project routes registration through Func
+  (`register_entry: "func"`), which is where the site's own rules — invite codes,
+  domain allowlists — actually hold. It takes no code, ticket, or verification
+  flag: verify before calling it. Sessions are issued by the platform, never by Func.
+- `ctx.users` — **the project's user directory**, a separate top-level namespace
+  because it can point at anybody, unlike `ctx.auth`: `find` (returns null when
+  absent), `checkPassword` (boolean; failures share the login lockout budget and
+  throw 429 once spent) and `setPassword` (hashes, and revokes every session of
+  that user).
 - `ctx.verify` — `start` / `confirm` a verification code (`channel`, `to`,
   `purpose`). In Func, `confirm` returns only a boolean: there is no ticket and no
   cookie, because confirm and register run in the same execution.

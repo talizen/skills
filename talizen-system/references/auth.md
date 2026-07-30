@@ -119,6 +119,20 @@ await useAuth().register({ account: email, email, password })   // no code argum
   around: do not add your own "is this email taken" check in page code, which is
   exactly the probe the default prevents.
 
+## Forgot / Change Password
+
+There is **no SDK call and no platform endpoint for this** — `useAuth()` has no
+`resetPassword`, and adding one is not pending. The flow is written in the site's
+own Func with `ctx.users.find` / `ctx.users.checkPassword` / `ctx.users.setPassword`,
+and the page just calls it through `invoke()`. See `references/func.md`.
+
+Page code's only jobs: collect the address, then the code plus the new password,
+and **show the same message whether or not the account exists** — the Func returns
+an identical response by design, so do not add an "is this email registered" check
+to make the UI more informative. After a successful reset the user's sessions are
+gone (including the current one), so send them to the login page rather than
+assuming they are still signed in.
+
 **You may tighten this file, not loosen it.** Adding a channel, switching
 `register_entry` to `func`, or closing registration is allowed. Removing a
 channel, switching back to `sdk`, reopening registration, or turning on
