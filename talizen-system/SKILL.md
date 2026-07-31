@@ -54,6 +54,8 @@ checklist; `## References` maps each topic to its `references/*.md`.
   unsupported.
 - Prefer Tailwind v4 utilities. Use `/index.css` only for tokens, keyframes,
   complex selectors, or custom utilities. No inline `style` or page `<style>`.
+- `/index.css` is loaded on every page automatically. Never import a `.css` file
+  from a page or component; it breaks the render.
 - Static files, including a self-contained standalone HTML file, go under
   `public/` (served at the domain root); a project-root `index.html` is NOT
   served.
@@ -102,9 +104,11 @@ checklist; `## References` maps each topic to its `references/*.md`.
 5. Make focused edits. Writes return the patched region and that file's
    `syntax_errors` — do not re-read a file to confirm an edit landed.
 6. Run `lint` once after the last edit, never per edit; it is a compile, config
-   and cross-file check, and its `browser_check` already exercises the live
-   preview. Do not follow it with a routine `browser` call — a screenshot is not
-   how a task ends. Open a route only when something is genuinely unverified: a
+   and cross-file check, and its `browser_check` renders the page client-side
+   the way the editor canvas does, not through the server-rendered preview
+   route.
+   Do not follow it with a routine `browser` call — a screenshot is not how a
+   task ends. Open a route only when something is genuinely unverified: a
    brand-new route, a reported failure (add `?dev`), or a subjective aesthetic
    request you cannot read off the code.
 7. On any lint, typecheck, build, preview, browser, or runtime failure, follow

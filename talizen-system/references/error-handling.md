@@ -39,6 +39,9 @@ For browser, runtime, or network render errors:
 - Stop if the error does not point to a specific project file.
 - Stop if further fixes would require guessing, broad rewrites, or changing the
   build/runtime strategy.
+- Two different renderers: `lint`'s `browser_check` checks the client-side
+  editor canvas, `browser` checks the server-rendered preview. Either one
+  passing leaves the other unverified — report which you checked.
 
 ## Allowed Attempts
 
@@ -66,6 +69,13 @@ an SSR load failure — not a data bug. Check in order:
 
 `getContent(key, slug)` takes a slug and is not locale-sensitive. Do not swap it
 for a `listContents` scan on suspicion.
+
+## Known Quick Fixes
+
+### `Failed to resolve module specifier "/index.css"`
+
+Project code imported a stylesheet. `/index.css` already loads on every page —
+delete the import line rather than fixing the specifier or adding a shim.
 
 ## Known Non-Fixable Cases
 
