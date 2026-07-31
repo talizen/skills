@@ -10,7 +10,7 @@ CSS in `index.css`, which has caused real bugs (a later generic class silently
 overriding an earlier rule, cascade/purge quirks). Arbitrary values are fine
 when no token fits (`pt-[92px]`, `text-[clamp(26px,4.6vw,58px)]`).
 
-Write standalone CSS (in `index.css`) only for what utilities can't express:
+Write standalone CSS (in `/index.css`) only for what utilities can't express:
 `@keyframes`, `:has()`/complex-selector state (especially driving CSS
 variables), and scales reused across many elements (hoist to an `@utility`). Do
 not re-author component layout as semantic CSS classes. Never use inline `style`
@@ -26,6 +26,11 @@ child color with a single hover or `group-hover` rule.
 Use `/index.css` only for `@theme` tokens, `@utility` definitions (applied back
 as classes), base layers, and the narrow escape-hatch CSS above — not for
 component layout. Supports both plain CSS and Tailwind directives.
+
+The platform loads it on every page — unlike Vite/CRA/Next there is no entry
+file and nothing to import. Write the CSS, then use the classes, tokens, or
+animation names in JSX. `import "/index.css"` or `import "./index.css"` in a
+page or component breaks the render.
 
 Minimal example:
 
