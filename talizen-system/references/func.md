@@ -79,25 +79,30 @@ Secrets and integrations
   write an `Authorization` header for such a capability, and never work around a
   "not configured / not verified / disabled" error by going direct — that is a
   user action in the panel.
-- Email and email verification codes work this way, through `ctx.email`. The
-  platform already enforces code generation, expiry, single-use consumption,
-  constant-time comparison, the wrong-attempt cap, and rate limiting. Do not
-  reimplement any of it: no `Math.random()` codes, no `ctx.cache` code storage,
-  no hand-rolled attempt counters. A verified code proves mailbox control, not a
-  session.
-- `ctx.email.sendCode` / `verifyCode` are the **site's own** namespace (order
-  confirmations, unsubscribe confirmations, **password reset**). Only
-  registration uses `ctx.verify`, which runs on the platform's reserved scene.
+- **Which capabilities are managed is answered by the index, not by this file.**
+  Email, verification codes and payment are; the list grows with each release.
+  Read the matching doc before writing anything for them — the platform already
+  enforces exactly the parts that go silently wrong when hand-rolled (code
+  generation, expiry, single-use consumption, constant-time comparison, attempt
+  caps, rate limiting; signature verification and merchant checks for payment),
+  and reimplementing any of it is a security regression, not a fallback.
+- Two consequences of that hold regardless of what the docs say: a verified code
+  proves mailbox control, **not** a session; and a code you sent for the site's own
+  purposes is not a registration proof — registration runs on the platform's
+  reserved scene through `ctx.verify`.
 - When registration is routed through Func (`register_entry: "func"`),
   **verification is performed by your code and the platform checks nothing**:
   `ctx.auth.register` takes no code, no ticket, and no "already verified" flag.
   Confirm the code first and return early if it fails — reaching `register` is
   itself the decision that verification passed. There is no project setting to
   turn verification on for this path, so never tell the user to enable one.
-- There is **no managed payment integration and no `ctx.payment`**, and no
-  built-in payment SDK. A payment callback must verify the provider signature,
-  merchant identity, local order, amount, and paid state before an idempotent
-  update, then return the provider's exact acknowledgement.
+- A callback the platform does **not** wrap for you — a payment provider it has no
+  integration for, or any third-party webhook — must verify the provider signature
+  **over the raw body**, then the merchant identity, your local order, the amount
+  and the paid state, before an idempotent update, and return the provider's exact
+  acknowledgement string. Re-serialising the body before verifying breaks the
+  signature; trusting a browser redirect parameter instead of the callback is how
+  free goods get shipped.
 
 Data and identity
 
@@ -162,32 +167,23 @@ Timeouts
 
 ## ctx Surface
 
-Names only — read the live docs for signatures, return shapes and limits:
+**Not listed here on purpose.** The set of `ctx` namespaces grows with each
+platform release, so any copy in this file goes stale silently — and a stale list
+is worse than none: it tells you a capability does not exist when it does, and you
+then write `fetch` against a provider the platform already wraps. Get the current
+set from the index above; `ctx` is also fully typed, so
+`import type { TalizenFuncContext } from 'talizen/func-runtime'` gives it to you in
+the editor.
 
-- `ctx.db` — project JSON tables
-- `ctx.auth` — **the caller of this request**: current / required user, plus
-  `register` when the project routes registration through Func
-  (`register_entry: "func"`), which is where the site's own rules — invite codes,
-  domain allowlists — actually hold, and `login` to sign an existing user in.
-  Neither takes a code, ticket, or verification flag: verify before calling them.
-  Session tokens are minted by the platform, never handled by Func code.
-- `ctx.users` — **the project's user directory**, a separate top-level namespace
-  because it can point at anybody, unlike `ctx.auth`: `find` (returns null when
-  absent), `checkPassword` (boolean; failures share the login lockout budget and
-  throw 429 once spent) and `setPassword` (hashes, and revokes every session of
-  that user).
-- `ctx.verify` — `start` / `confirm` a verification code (`channel`, `to`,
-  `purpose`). In Func, `confirm` returns only a boolean: there is no ticket and no
-  cookie, because confirm and register run in the same execution.
-- `ctx.cache` — short-lived values, counters, expiry
-- `ctx.request`, `ctx.response`, `ctx.cookies` — request info, status, cookies
-- `ctx.assets` — upload bytes generated inside Func
-- `ctx.email` — transactional mail and verification codes (needs an integration)
-- `ctx.sse` — bounded incremental events
-- `ctx.trace_id` — correlate one call in logs
+The runtime facts around `ctx` do belong here, because they hold whatever the
+surface looks like:
 
-`fetch`, `Response`, `TextDecoder` and Web Crypto (`crypto`) are globals; a
-returned `Response` bypasses the JSON envelope for webhooks and callbacks.
+- Reach capabilities only through `ctx` — never the legacy globals, never a
+  hand-rolled equivalent of something the platform wraps.
+- `fetch`, `Response`, `TextDecoder` and Web Crypto (`crypto`) are globals; a
+  returned `Response` bypasses the JSON envelope, which is what webhook and payment
+  callbacks need in order to answer with the provider's exact acknowledgement.
+- `ctx.trace_id` correlates one call across logs.
 
 ## Workflow
 
