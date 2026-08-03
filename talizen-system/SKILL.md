@@ -136,11 +136,10 @@ reach its topic; do not read the others.
   protected flows.
 - `func.md` — Func invariants: code and keys, JSON tables, secrets, asset
   uploads, third-party API keys, managed integrations, auth inside Func,
-  `invoke(...)`, `/func/<key>`. It deliberately does **not** enumerate the `ctx`
-  surface or which capabilities are managed — that set changes with each release.
-  The API reference is live at `https://www.creght.cn/api.md`; read the matching
-  doc there before writing Func code instead of relying on remembered signatures,
-  defaults, or limits.
+  `invoke(...)`, `/func/<key>`. It does not enumerate the `ctx` surface or which
+  capabilities are managed — that changes each release. The API reference is live at
+  `https://www.creght.cn/api.md`; read the matching doc before writing Func code
+  instead of relying on remembered signatures, defaults, or limits.
 - `seo.md` — `metadata`, viewport, Open Graph, keywords, favicon, legacy `seo`
   migration.
 - `carousel.md` — carousel/slideshow setup.
