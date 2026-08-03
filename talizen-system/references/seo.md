@@ -81,6 +81,9 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 - `metadata.icons` merges by slot: page `shortcut`, `icon`, `apple`, or `other`
   replaces that slot only when non-empty.
 
+Site `metadata.title` and `metadata.description` also drive `/llms.txt`; never
+hand-write one. See `platform-endpoints.md`.
+
 ## Icons
 
 `metadata.icons` emits favicon/touch links in this order: `shortcut`, `icon`,
