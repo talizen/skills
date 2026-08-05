@@ -6,7 +6,8 @@ title: Talizen SEO & Metadata
 
 Use Talizen's structured `metadata` model for SEO. It applies at two levels:
 
-- Site defaults in `talizen.config.ts`.
+- Site defaults in `talizen.config.ts`. May be written as `metadata: (ctx) => ({…})`
+  to branch on locale or host — see `site-code.md`.
 - Page metadata exported from each page component.
 
 Avoid custom `seo` objects and raw tags when `metadata` can express the same
@@ -76,6 +77,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 - A site title template such as `{ template: "%s | Acme", default: "Acme" }`
   wraps literal page titles.
 - A page title object with `{ absolute: "About" }` bypasses the site template.
+- `title.template` in the site layer wraps literal page titles.
 - Other page fields override the same site fields when defined; otherwise site
   fields fall back.
 - `metadata.icons` merges by slot: page `shortcut`, `icon`, `apple`, or `other`
