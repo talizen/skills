@@ -107,6 +107,10 @@ For shadcn/ui-style registry components:
 - Common registries: `@spell`, `@fancy`, `@react-bits`, `@talizen-sections`.
 - For polished effects or animations, prefer registry search before custom code.
 - Ensure animated layers do not block content, readability, or responsiveness.
+- Trigger entrance animations on viewport entry, not a load-time
+  `animation-delay` — below-the-fold content otherwise finishes animating unseen.
+- Use the built-in `motion/react` for stagger, exit, or layout animation; CSS is
+  enough for hover and simple reveals.
 
 Minimal `components.json`:
 
