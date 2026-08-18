@@ -108,6 +108,8 @@ Data and identity
 - Use `ctx.auth.requireUser()` for protected backend actions. Auth UI uses
   `useAuth()` from `talizen/auth` (see `references/auth.md`); never hand-roll
   password hashing, session tokens, or OAuth callbacks in Func.
+- Lookup by a user-supplied code must not return others' PII, and caller-supplied
+  input must never re-assign record ownership.
 - **Sign-in can be a Func**: `ctx.auth.login(ref)` issues a session for an existing
   user, which is the only way to build passwordless (emailed-code) login or to apply
   your own rules — bans, required onboarding steps, tenant checks — at sign-in. The
