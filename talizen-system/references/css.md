@@ -27,6 +27,9 @@ Use `/index.css` only for `@theme` tokens, `@utility` definitions (applied back
 as classes), base layers, and the narrow escape-hatch CSS above — not for
 component layout. Supports both plain CSS and Tailwind directives.
 
+Palette goes in `@theme` and is used via the generated classes; never declare
+`:root` vars then hardcode hex everywhere.
+
 The platform loads it on every page — unlike Vite/CRA/Next there is no entry
 file and nothing to import. Write the CSS, then use the classes, tokens, or
 animation names in JSX. `import "/index.css"` or `import "./index.css"` in a
