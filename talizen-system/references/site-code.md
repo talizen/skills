@@ -129,6 +129,10 @@ For shadcn/ui-style registry components:
   `animation-delay` — below-the-fold content otherwise finishes animating unseen.
 - Use the built-in `motion/react` for stagger, exit, or layout animation; CSS is
   enough for hover and simple reveals.
+- Honour `prefers-reduced-motion`: show the content immediately instead of
+  animating it. One branch in the reveal component covers the whole site, and
+  without it the reveal never fires for those users — they get blank sections,
+  not a calmer page.
 
 Minimal `components.json`:
 
