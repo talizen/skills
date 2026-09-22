@@ -49,6 +49,13 @@ export default {
 Pages may export `metadata` or `generateMetadata`. Use `generateMetadata` when
 SEO depends on params, query data, or CMS content.
 
+**Every new page needs its own.** A page without `metadata` silently inherits
+the site title, so a five-page site ships five identical `<title>` tags and one
+of the cheapest SEO wins is gone. Write it when you create the page, not in a
+later "SEO pass" — by then nobody remembers which pages were added. Detail pages
+generated from one template are the usual casualty: the template has no
+`metadata`, so every instance shares the site title.
+
 ```tsx
 import type { Metadata } from "talizen"
 
@@ -150,9 +157,45 @@ When migrating old `seo` fields or SEO tags in `customCode.head`:
 For requests like "add OG" or "add keywords", edit `metadata.openGraph` and
 `metadata.keywords`; do not add duplicate raw tags.
 
+## Structured Data (JSON-LD)
+
+`metadata` cannot express schema.org, so JSON-LD goes in as a raw
+`application/ld+json` script — via `customCode.head` for site-wide facts, or
+inside the page for page-specific ones.
+
+Pick the type from what the page *is*, not from what the site is. The common
+mistake is stamping the same business object on every page:
+
+| Page | Type |
+| --- | --- |
+| home / contact | `LocalBusiness` or a subtype (`CafeOrCoffeeShop`, `Store`…) |
+| one product, one dish, one plan | `Product` with `offers` |
+| an article | `Article` / `BlogPosting` |
+| a page with real Q&A on it | `FAQPage` |
+| a multi-step how-to | `HowTo` |
+
+A product detail page carrying only the shop's `LocalBusiness` block tells
+search engines nothing about the product. Either give it a `Product` block, or
+nest the products as `makesOffer` on the business object — both are valid, but
+one of them has to be there.
+
+Two rules that break it silently:
+
+- **Every fact in the JSON-LD must be visible on the page.** Prices, hours,
+  ratings and answers that appear only in the markup are grounds for a
+  structured-data penalty, not a bonus.
+- **Keep it in sync with the copy.** When the visible FAQ or price changes, the
+  JSON-LD is a second place holding the same string. Leave a comment at both
+  sites saying so.
+
 ## AI SEO Workflow
 
 1. Inspect `talizen.config.ts` for global `metadata`.
 2. Inspect the page component for `metadata` or `generateMetadata`.
 3. Apply changes primarily to title, description, keywords, and Open Graph.
-4. Use `customCode.head` only for unsupported SEO tags.
+4. Add or correct JSON-LD per the table above — check the type actually matches
+   each page.
+5. Walk `/robots.ts`, `/sitemap.ts` and `/llms.ts`; see
+   `platform-endpoints.md` "When you must write these files". Asked for GEO
+   specifically, `/llms.txt` is the file AI assistants read.
+6. Use `customCode.head` only for unsupported SEO tags.

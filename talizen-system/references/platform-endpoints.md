@@ -11,13 +11,37 @@ same-named file under `/public` is never reached, and nothing warns you.
 | --- | --- | --- |
 | `/robots.txt` | platform defaults | `/robots.ts` |
 | `/sitemap.xml` | page scan + `generateStaticParams` | `/sitemap.ts` |
+| `/llms.txt` | sitemap's page list + `metadata` | `/llms.ts` |
+| `/<page>.md` | the page itself | — |
 
 A page whose filename contains `[param]` **must** export `generateStaticParams`,
 or none of its URLs reach `sitemap.xml` and static export, silently. See
 `sitemap.md`.
 
-| `/llms.txt` | sitemap's page list + `metadata` | `/llms.ts` |
-| `/<page>.md` | the page itself | — |
+## When you must write these files
+
+The defaults are fine for a site where every page is meant to be public. They
+are wrong the moment a page is not, and nothing warns you: **every page the
+platform can see goes into `sitemap.xml` and `/llms.txt` automatically**, and
+the default `robots.txt` is `Allow: /`.
+
+So whenever the site has a page that is per-user, gated, or an internal detail
+(`/my-orders`, `/account`, `/dashboard`, a thank-you page, a search result
+page), that page needs excluding in **all three** places, because each feeds a
+different consumer:
+
+| File | Keeps it out of | Miss it and |
+| --- | --- | --- |
+| `/robots.ts` → `disallow` | crawlers | it gets indexed |
+| `/sitemap.ts` | the submitted URL list | you actively ask for it to be indexed |
+| `/llms.ts` → `exclude` | `/llms.txt` | you hand it to AI assistants |
+
+Doing one and forgetting the others is the common failure. Listing a personal
+page under an `llms.ts` section is the inverse of excluding it: it advertises
+the page to every AI crawler that reads the file.
+
+Asked for "SEO" or "GEO" work, walk all three files, not just the one that
+looks most relevant.
 
 `/llms.txt` takes its title and summary from `metadata.title` and
 `metadata.description`, so improving those updates it automatically. There is no
