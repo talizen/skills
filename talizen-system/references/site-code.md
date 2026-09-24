@@ -158,11 +158,16 @@ Package imports and Talizen platform imports keep normal specifiers, such as
 
 ## Import Map
 
-The platform provides common packages such as `react`, `react-dom`, and
-`talizen`; do not add them manually.
+`get_import_map` returns every specifier the site can import, with `sources`
+marking each one `builtin` or `talizen.config`. The built-in set is broad and
+changes over time, so look it up rather than assuming — e.g. `three`, `gsap`
+(with `gsap/*` plugins), `lenis`, and `motion` are built in today. Import a
+built-in by its specifier with no config entry.
 
-Add or change third-party dependencies in `talizen.config.ts`
-`importMap.imports`. Use exact ESM URLs where possible.
+Add a dependency in `talizen.config.ts` `importMap.imports` only when the
+lookup lacks it, using an exact ESM URL. Leave built-in specifiers out of the
+config: an override changes only the browser's copy, while SSR keeps the
+platform's version.
 
 ```ts
 export default {
@@ -178,14 +183,21 @@ For media assets, do not commit/import local binaries. Use complete absolute
 URLs, platform CDN URLs returned by upload tools, or tiny `data:` URIs. Func
 runtime assets should use `ctx.assets.upload(...)` and store returned metadata.
 
+### Text Imports (`?raw`)
+
+Append `?raw` to import any site file as a string, in SSR and the browser alike:
+
+```ts
+import vertexShader from "../components/scene/shaders/particles.vert.glsl?raw"
+```
+
+Keep shaders, SVG markup, and other text sources as their own files this way.
+
 ### SSR Availability
 
 The browser resolves importMap entries from their CDN URLs. SSR resolves bare
-imports from the render server's `node_modules`, which holds only the packages
-the platform provides. Read the project's `talizen.config.ts` to tell the two
-apart: entries declared there were added by the project and do not exist on the
-render server. Do not assume a fixed built-in list — the platform updates its
-own set independently.
+imports from the render server's `node_modules`, which holds only the platform
+built-ins — the entries `get_import_map` marks `builtin`.
 
 Importing a project-added package anywhere in a page's module graph therefore
 breaks that page's SSR. The page falls back to client-only rendering, losing SSR
@@ -193,8 +205,10 @@ and SEO, and may also lose its `getServerSideProps` props and render its own
 empty or not-found branch while route and data are fine. `lint` only checks that
 the specifier is declared, so it still reports `browser_check: passed`.
 
-No directive keeps SSR for such a page. Write the logic in project code, or use
-a package the platform already provides.
+To use a project-added package and keep SSR, load it only in the browser: put
+the code that imports it in its own module and pull that module in with
+`await import()` inside `useEffect` (effects never run during SSR). Otherwise
+write the logic in project code, or use a built-in.
 
 Browser globals cause a softer version of the same downgrade: keep `window`,
 `document`, and `navigator` out of module scope and render (including
@@ -314,6 +328,12 @@ A `public/*.html` file is not part of routing, SSR, `metadata`/SEO, i18n, CMS,
 or the component system; do not use it for real site pages. Never write a
 project-root `index.html` to satisfy a "single HTML file" request — it is not
 served; put it in `public/`.
+
+`public/` files are site source: stored in the database and copied into every
+version. Each file has a small size cap; a write over it fails with the cap in
+the error. Keep `public/` to small text files, and put images, bundles,
+models, and other large files on the CDN with `upload_attachment`, referencing
+the returned URL.
 
 ## Package Types
 
