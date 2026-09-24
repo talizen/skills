@@ -46,10 +46,11 @@ checklist; `## References` maps each topic to its `references/*.md`.
   `/component` roots. Prefer plural roots only for new projects.
 - Use `getServerSideProps(context)` for route params and public first-render
   data. Do not read auth, call Func, or import browser SDKs in SSR.
-- Only platform built-in importMap packages may appear in a page's module graph.
-  A dependency added to `talizen.config.ts` resolves in the browser but not in
-  SSR, silently dropping the page to client-only rendering; `lint` misses it.
-  See `references/site-code.md` "SSR Availability".
+- Call `get_import_map` before adding a dependency: the platform already ships
+  many (three, gsap, motion, ...). `builtin` packages import anywhere; a
+  `talizen.config` package loads only via `await import()` inside `useEffect` —
+  a static import silently drops the page to client-only rendering, and `lint`
+  misses it. See `references/site-code.md` "SSR Availability".
 - Use relative imports for local files; aliases such as `@/lib/utils` are
   unsupported.
 - Prefer Tailwind v4 utilities. Use `/index.css` only for tokens, keyframes,
@@ -58,7 +59,8 @@ checklist; `## References` maps each topic to its `references/*.md`.
   from a page or component; it breaks the render.
 - Static files, including a self-contained standalone HTML file, go under
   `public/` (served at the domain root); a project-root `index.html` is NOT
-  served.
+  served. `public/` is versioned site source with a small per-file cap; large
+  files go to the CDN via `upload_attachment`.
 - Do not commit/import local binaries. Use absolute URLs, tiny `data:` URIs, or
   the platform CDN URL from `upload_attachment`.
 - Do not create `*.canvas.ts(x)` unless explicitly asked; they are platform
