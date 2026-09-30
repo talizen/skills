@@ -96,15 +96,24 @@ checklist; `## References` maps each topic to its `references/*.md`.
 
 Before writing `index.css`, the theme colors or the first page of a new site,
 a new homepage, or a visual redesign, you MUST call `search_ui_refs` (when the
-tool exists). An old site the user wants rebuilt or upgraded is content to
-migrate, not a visual reference — still call it. Skip it only when the user
-attached reference images or named sites to imitate.
+tool exists). Skip it only when the user attached reference images or named
+sites to imitate.
 
 - Pick the closest values: B2B / export / "独立站" → site_type `外贸B2B`;
   manufacturers, machining, parts, equipment → industry `工业 / 制造 / B2B`.
-- Open the 1-3 best matches with `view_images`, then decide palette, layout
-  rhythm, hero treatment, imagery and type mood from them before coding. When
-  they disagree with your first idea, follow the references.
+- The results differ in style. Open 2-3 that best match the user's own words
+  with `view_images`, then decide palette, layout rhythm, hero treatment,
+  imagery and type mood from them before coding. When they disagree with your
+  first idea, follow the references.
+- Upgrading an existing site: screenshot it once (`browser`,
+  `external_reference`) to see its logo, brand color and which photos show
+  real products or factories; reuse those photos. Its old layout is not the
+  direction — the references are.
+- Unless the chosen references do it, avoid: gradient headline text, glowing
+  buttons, monospace all-caps labels everywhere, dashboard-style stat cards in
+  the hero, a hero without a real photo, and stacks of spec badges on cards.
+  Keep one language per page (an overseas site is English only; never
+  "Products / 产品").
 - Blend them into an original design. Never copy their text, logos, product
   names or photos.
 
