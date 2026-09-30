@@ -92,6 +92,16 @@ checklist; `## References` maps each topic to its `references/*.md`.
   users, passwords, sessions, OAuth callbacks, or account identity with Func or
   JSON tables.
 
+## Visual Direction For New Sites
+
+When building a site from scratch, or when the user asks for a major visual
+redesign, call `search_ui_refs` once before writing the first page (skip it if
+the tool is not available, or the user already supplied reference images or
+sites). Pass the site's industry and site type, then open the 1-3 best matches
+with `view_images`. Take palette, layout rhythm, hero treatment and type mood
+from them and blend them into an original design. Never copy their text, logos,
+product names or photos.
+
 ## Default Workflow
 
 1. Locate the project root; read `AGENTS.md` if present.
