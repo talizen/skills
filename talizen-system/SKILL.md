@@ -94,13 +94,19 @@ checklist; `## References` maps each topic to its `references/*.md`.
 
 ## Visual Direction For New Sites
 
-When building a site from scratch, or when the user asks for a major visual
-redesign, call `search_ui_refs` once before writing the first page (skip it if
-the tool is not available, or the user already supplied reference images or
-sites). Pass the site's industry and site type, then open the 1-3 best matches
-with `view_images`. Take palette, layout rhythm, hero treatment and type mood
-from them and blend them into an original design. Never copy their text, logos,
-product names or photos.
+Before writing `index.css`, the theme colors or the first page of a new site,
+a new homepage, or a visual redesign, you MUST call `search_ui_refs` (when the
+tool exists). An old site the user wants rebuilt or upgraded is content to
+migrate, not a visual reference — still call it. Skip it only when the user
+attached reference images or named sites to imitate.
+
+- Pick the closest values: B2B / export / "独立站" → site_type `外贸B2B`;
+  manufacturers, machining, parts, equipment → industry `工业 / 制造 / B2B`.
+- Open the 1-3 best matches with `view_images`, then decide palette, layout
+  rhythm, hero treatment, imagery and type mood from them before coding. When
+  they disagree with your first idea, follow the references.
+- Blend them into an original design. Never copy their text, logos, product
+  names or photos.
 
 ## Default Workflow
 
