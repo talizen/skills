@@ -94,21 +94,18 @@ checklist; `## References` maps each topic to its `references/*.md`.
 
 ## Visual Direction For New Sites
 
-Before writing `index.css`, the theme colors or the first page of a new site,
-a new homepage, or a visual redesign, you MUST call `search_ui_refs` (when the
-tool exists). Skip it only when the user attached reference images or named
-sites to imitate.
+Decide the look from real references, not from habit. Before writing the theme
+or the first page of a new site, a new homepage or a visual redesign, look at
+the team's curated UI references for the site's industry and kind — unless the
+user already gave reference images or sites to imitate.
 
-- Pick the closest values: B2B / export / "独立站" → site_type `外贸B2B`;
-  manufacturers, machining, parts, equipment → industry `工业 / 制造 / B2B`.
-- The results differ in style. Open 2-3 that best match the user's own words
-  with `view_images`, then decide palette, layout rhythm, hero treatment,
-  imagery and type mood from them before coding. When they disagree with your
-  first idea, follow the references.
-- Upgrading an existing site: screenshot it once (`browser`,
-  `external_reference`) to see its logo, brand color and which photos show
-  real products or factories; reuse those photos. Its old layout is not the
-  direction — the references are.
+- Several references differ in style: choose the ones closest to the user's
+  own words, and take palette, layout rhythm, hero treatment, imagery and type
+  mood from them before coding. When they disagree with your first idea,
+  follow the references.
+- Upgrading an existing site: look at it (a screenshot, not just its text) to
+  learn its logo, brand color and which photos show real products or
+  factories, and reuse those photos. Its old layout is not the direction.
 - Unless the chosen references do it, avoid: gradient headline text, glowing
   buttons, monospace all-caps labels everywhere, dashboard-style stat cards in
   the hero, a hero without a real photo, and stacks of spec badges on cards.
