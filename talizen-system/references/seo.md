@@ -160,8 +160,8 @@ For requests like "add OG" or "add keywords", edit `metadata.openGraph` and
 ## Structured Data (JSON-LD)
 
 `metadata` cannot express schema.org, so JSON-LD goes in as a raw
-`application/ld+json` script — via `customCode.head` for site-wide facts, or
-inside the page for page-specific ones.
+`application/ld+json` script — via `head` in `talizen.config.ts` for site-wide
+facts, or inside the page for page-specific ones.
 
 Pick the type from what the page *is*, not from what the site is. The common
 mistake is stamping the same business object on every page:
@@ -179,7 +179,12 @@ search engines nothing about the product. Either give it a `Product` block, or
 nest the products as `makesOffer` on the business object — both are valid, but
 one of them has to be there.
 
-Two rules that break it silently:
+Three rules that break it silently:
+
+- **Never hard-code the domain in `url` / `@id`.** The free or preview domain
+  the site is built on stops being canonical once a custom domain is bound.
+  Build absolute URLs from the request host: `head: (ctx) => …` with `ctx.host`
+  in config, `context.request.host` in `getServerSideProps`.
 
 - **Every fact in the JSON-LD must be visible on the page.** Prices, hours,
   ratings and answers that appear only in the markup are grounds for a
