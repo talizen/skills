@@ -76,6 +76,14 @@ checklist; `## References` maps each topic to its `references/*.md`.
 - `/platform/**` is live project state, not site source: it is **not** covered by
   site versions or `revert_version`, and it is shared by every site in the
   project. A rollback restores source files only — a schema change stays applied.
+- A value that appears in several places and must stay the same site-wide (QR
+  code, phone, email, social link, notice text) is a **site variable**: define it
+  in `/platform/vars.json`, read it with `useVars()`. Never hard-code it in
+  several files, and never use a one-entry CMS collection for it. See
+  `references/site-code.md` "Site Variables".
+- A custom admin UI for the site owner ("a page to manage X") is a **manage page**
+  under `/pages/_manage/` with Funcs under `/backend/func/_manage/`, opened from
+  the editor's Manage panel. See `references/site-code.md` "Manage Pages".
 - Never edit `/types/cms.d.ts` or `/types/form.d.ts`. They regenerate from
   `/platform/cms/*.json` and `/platform/form/*.json`; re-read after a schema edit.
 - CMS rich-text body fields (e.g. an article `body`) are HTML, not Markdown;
