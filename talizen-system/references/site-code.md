@@ -95,6 +95,90 @@ private user data, and writes in browser SDK/Func/API flows. When part of the
 page changes fast (e.g. an article list with view counters), SSR/cache the
 stable part and fetch the volatile part after hydration.
 
+## Site Variables
+
+A value used in several places that must stay identical site-wide — a WeChat QR
+code, service phone, email, social links, a notice banner and its on/off switch —
+is a site variable. The user edits it in the editor under **Manage → Site
+variables**; the change is live immediately, with no publish.
+
+Do not hard-code such a value in several files (edits miss copies), and do not
+use a CMS collection with a single entry (it is a list, read as "the first item").
+Keep long or repeating content (articles, products) in CMS.
+
+Definition and values are one file, `/platform/vars.json` (project-level live
+state like the rest of `/platform/`, not versioned with site source):
+
+```json
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "wechatQrcode": { "type": "string", "contentMediaType": "image/*", "title": "WeChat QR code" },
+      "servicePhone": { "type": "string", "title": "Service phone" },
+      "noticeEnabled": { "type": "boolean", "title": "Show top notice" },
+      "noticeText": { "type": "string", "x-ui": "textarea", "title": "Notice text" }
+    }
+  },
+  "values": { "wechatQrcode": "https://...", "servicePhone": "400-820-1234" }
+}
+```
+
+- Names are JS identifiers (`wechatQrcode`, not `wechat-qrcode`); give every var a
+  human `title`, it is the form label the user sees.
+- Field types follow the CMS schema dialect: image = `contentMediaType: "image/*"`,
+  link = `format: "uri"`, long text = `x-ui: "textarea"`, plus `number`, `boolean`.
+- `values` may only contain declared vars and must match their types. To remove a
+  var, delete it from both `schema.properties` and `values`. Move the current
+  hard-coded value into `values` so the site looks the same after the change.
+- Values are injected into every page, so keep them small (URLs, short text).
+
+Read them synchronously in any component, including shared ones like a footer —
+no fetch, same value in SSR and the browser:
+
+```tsx
+import { useVars } from "talizen"
+
+export function Footer() {
+  const vars = useVars<{ wechatQrcode?: string; servicePhone?: string }>()
+  return (
+    <footer>
+      {vars.wechatQrcode && <img src={vars.wechatQrcode} alt="WeChat" />}
+      <a href={`tel:${vars.servicePhone ?? ""}`}>{vars.servicePhone}</a>
+    </footer>
+  )
+}
+```
+
+In `getServerSideProps` / `generateMetadata` use `getVars()` (not a hook). Unset
+vars are `undefined`; always render a fallback.
+
+## Manage Pages
+
+When the editor's generic forms (Site variables, CMS) are not handy enough for a
+task — "see every QR code and where it is used, swap them in one go", "inquiries
+grouped by product" — build a **manage page**: a page for project members only,
+opened from the editor under **Manage**. It is ordinary site code:
+
+- Page: `/pages/_manage/<name>.tsx` → `/_manage/<name>`. Give it
+  `export const metadata = { title: "…" }`; the title is its name in the editor.
+  It renders only on the preview domain inside the editor; on the public site
+  `/_manage/*` is a 404 and never in the sitemap.
+- Funcs: `/backend/func/_manage/<name>.ts`, called as `invoke("_manage/<name>.<method>", input)`.
+  The platform lets only signed-in project members call anything under `_manage/`
+  (before your code runs; `config.public` does not apply), so these Funcs need no
+  access check of their own. Never put manage logic in a Func outside `_manage/`.
+- Data: `ctx.vars.get()` / `ctx.vars.set({ name: value })` for site variables
+  (values only; `null` clears one), `ctx.cms.*` for CMS content, `ctx.forms.*` for
+  submissions, `ctx.db` for tables. Writes are live immediately — no publish.
+- Edit data only. A manage page must not try to change site code; if a value is
+  hard-coded in pages, first move it into a site variable or CMS, then manage that.
+- Load data on the client (`invoke` in an effect), not in `getServerSideProps`:
+  the member session belongs to the browser. Show loading and error states; a
+  `member_login_required` error means "open this page from the editor's Manage".
+- Keep it a working tool, not a landing page: dense, clear labels in the site's
+  language, explicit Save buttons, confirmation before deleting.
+
 ## Components
 
 Keep page files for route composition. Put reusable UI in the project's existing
