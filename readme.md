@@ -1,5 +1,15 @@
 # Talizen Skills
 
+> Agent skills for **[Talizen](https://www.talizen.com)** — the AI website builder that gives you the code.
+
+[Talizen](https://www.talizen.com) lets you build a website with AI or from a Figma design, edit it visually, and publish it — or export the React + Tailwind source and host it anywhere. Sites come with a built-in CMS, forms and backend (database, server functions, user sign-in, Stripe payments). Pricing: free plan, or Pro at $12/month for custom domains on up to 3 sites.
+
+The skills in this repository let coding agents such as Claude Code and Codex work on Talizen sites from your own editor: pull a site, edit pages, preview and publish.
+
+**Links:** [Website](https://www.talizen.com) · [Pricing](https://www.talizen.com/pricing) · [Help Center](https://www.talizen.com/docs/start) · [Talizen Skill guide](https://www.talizen.com/docs/talizen-skill) · [API for AI agents](https://www.talizen.com/api)
+
+## About this repository
+
 This repository provides Codex/agent skills for Talizen. They help agents understand Talizen project structure, CLI workflows, page development conventions, CMS/Form/SEO features, and other platform capabilities.
 
 ## What This Skill Does
