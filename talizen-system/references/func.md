@@ -83,6 +83,13 @@ Secrets and integrations
   file does not. Read the matching doc first — the platform already enforces what
   fails silently when hand-rolled, so reimplementing it is a regression, not a
   fallback.
+- A third-party **MCP server** is an integration too: the user adds it in
+  `panel/backend/integrations`, and the integration name is the server name in
+  `ctx.mcp("<name>", tool, args)`. The platform does the OAuth and holds the
+  tokens, so never implement MCP authorization, store MCP tokens, or call the
+  server with `fetch`. When the server connects each visitor's own account, catch
+  `code === "mcp_authorization_required"` and send the visitor to
+  `(await ctx.mcp.status(name)).authorize_url` — do not build a login flow.
 - A verified code proves mailbox control, not a session; a code sent for the site's
   own purposes is not a registration proof (registration uses `ctx.verify`).
 - When registration is routed through Func (`register_entry: "func"`),
